@@ -15,8 +15,8 @@
 | **AI/ML** | 8 | [ai-powered-services](https://github.com/Turbo-the-tech-dev/ai-powered-services), [ml-fundamentals](https://github.com/Turbo-the-tech-dev/ml-fundamentals), [llm-fundamentals](https://github.com/Turbo-the-tech-dev/llm-fundamentals), [generative-ai](https://github.com/Turbo-the-tech-dev/generative-ai), [prompt-engineering](https://github.com/Turbo-the-tech-dev/prompt-engineering), [human-ai-collaboration](https://github.com/Turbo-the-tech-dev/human-ai-collaboration), [advanced-prompt-engineering](https://github.com/Turbo-the-tech-dev/advanced-prompt-engineering), [computer-science-ai](https://github.com/Turbo-the-tech-dev/computer-science-ai) |
 | **Electrical** | 2 | [electrical-field](https://github.com/Turbo-the-tech-dev/electrical-field), [sovereign-circuit-academy](https://github.com/Turbo-the-tech-dev/sovereign-circuit-academy) |
 | **Math** | 3 | [mathematicians](https://github.com/Turbo-the-tech-dev/mathematicians), [concrete-mathematics](https://github.com/Turbo-the-tech-dev/concrete-mathematics), [math-fundamentals](https://github.com/Turbo-the-tech-dev/math-fundamentals) |
-| **Special Projects** | 4 | [julia-programming](https://github.com/Turbo-the-tech-dev/julia-programming), [masters-of-reverse-engineering](https://github.com/Turbo-the-tech-dev/masters-of-reverse-engineering), [myers_archive](https://github.com/Turbo-the-tech-dev/myers_archive), [root](https://github.com/Turbo-the-tech-dev/root) |
-| **TOTAL** | **24** | All repositories deployed to GitHub ✅ |
+| **Special Projects** | 5 | [julia-programming](https://github.com/Turbo-the-tech-dev/julia-programming), [masters-of-reverse-engineering](https://github.com/Turbo-the-tech-dev/masters-of-reverse-engineering), [myers_archive](https://github.com/Turbo-the-tech-dev/myers_archive), [root](https://github.com/Turbo-the-tech-dev/root), [Todolite-Ruby](https://github.com/Turbo-the-tech-dev/Todolite-Ruby) |
+| **TOTAL** | **25** | All repositories deployed to GitHub ✅ |
 
 ---
 
@@ -68,7 +68,7 @@
 
 ---
 
-## 🔧 Special Projects (4)
+## 🔧 Special Projects (5)
 
 | Repository | Description | GitHub URL |
 |------------|-------------|------------|
@@ -76,6 +76,7 @@
 | **masters-of-reverse-engineering** | Binary analysis, malware RE | [github.com/Turbo-the-tech-dev/masters-of-reverse-engineering](https://github.com/Turbo-the-tech-dev/masters-of-reverse-engineering) |
 | **myers_archive** | Git/gh helper script | [github.com/Turbo-the-tech-dev/myers_archive](https://github.com/Turbo-the-tech-dev/myers_archive) |
 | **root** | Workspace CLAUDE.md, master index | [github.com/Turbo-the-tech-dev/root](https://github.com/Turbo-the-tech-dev/root) |
+| **Todolite-Ruby** | Ruby implementation of Todolite | [github.com/Turbo-the-tech-dev/Todolite-Ruby](https://github.com/Turbo-the-tech-dev/Todolite-Ruby) |
 
 ---
 
@@ -93,11 +94,11 @@
 
 ## ✅ Deployment Status
 
-**All 24 repositories are deployed to GitHub!**
+**All 25 repositories are deployed to GitHub!**
 
 | Status | Count | Details |
 |--------|-------|---------|
-| **Deployed** | 24 | All repos live on GitHub |
+| **Deployed** | 25 | All repos live on GitHub |
 | **Local Only** | 1 | `sovereign-circuit-academy` (active development) |
 | **Sync Required** | 0 | All repos up to date |
 
