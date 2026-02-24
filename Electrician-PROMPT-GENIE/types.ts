@@ -21,6 +21,26 @@ export interface PromptTemplate {
 }
 
 /**
+ * Represents a single question in the electrician interview quiz.
+ * Questions are stored in localStorage and loaded at runtime, so
+ * shape validation is required before use.
+ */
+export interface Question {
+  /** Unique identifier for the question */
+  id: string;
+  /** The question text shown to the candidate */
+  text: string;
+  /** Answer choices presented to the candidate */
+  options: string[];
+  /** Zero-based index of the correct answer within `options` */
+  correctAnswer: number;
+  /** Optional NEC article or code section referenced by the question */
+  necReference?: string;
+  /** Grouping label (e.g. "Conduit Fill", "Load Calculations") */
+  category?: string;
+}
+
+/**
  * Defines a structured reasoning approach that guides how the AI
  * frames and formats its responses (e.g. safety-first, schematic logic).
  */
