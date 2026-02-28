@@ -34,6 +34,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  # Testing
+  mocktail: ^1.0.1
+  fake_async: ^1.3.1
+
   # Code Generation
   build_runner: ^2.4.8
   json_serializable: ^6.7.1
