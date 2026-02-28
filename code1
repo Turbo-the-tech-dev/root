@@ -1,0 +1,32 @@
+import 'package:meta/meta.dart';
+
+@immutable
+class NECQuestion {
+  final String id;
+  final String codeSection; // e.g., "Article 250.64"
+  final String questionText;
+  final List<String> options;
+  final int correctIndex;
+  final String rationale;
+
+  const NECQuestion({
+    required this.id,
+    required this.codeSection,
+    required this.questionText,
+    required this.options,
+    required this.correctIndex,
+    required this.rationale,
+  });
+
+  // Zero-unnecessary-allocation factory
+  factory NECQuestion.fromMap(Map<String, dynamic> map) {
+    return NECQuestion(
+      id: map['id'] as String,
+      codeSection: map['section'] as String,
+      questionText: map['text'] as String,
+      options: List<String>.from(map['options']),
+      correctIndex: map['correctIndex'] as int,
+      rationale: map['rationale'] as String,
+    );
+  }
+}
