@@ -95,20 +95,34 @@ search_sector() {
     BEGIN {
         IGNORECASE = 1
         found = 0
+        in_sectors = 0
     }
     
-    # Match sector table rows
-    /\|.*[0-9]+.*\|.*\|/ {
+    # Detect Imperial Sectors section
+    /Imperial Sectors/ {
+        in_sectors = 1
+    }
+    
+    # Match sector table rows (e.g., "| 02 | Gemini | ...")
+    in_sectors && /\|.*\|.*\|/ {
         if ($0 ~ q) {
             print "MATCH: " $0
             found = 1
         }
     }
     
-    # Match sector directory links
-    /sectors\// {
+    # Also search for sector directory patterns
+    /sectors\/[0-9]+/ {
         if ($0 ~ q) {
             print "PATH: " $0
+            found = 1
+        }
+    }
+    
+    # Search for sector names anywhere in file
+    /Gemini|GitHub|Firestore|Termux|AWS|Vader|Flutter|Expo|Mainframe/ {
+        if ($0 ~ q && !in_sectors) {
+            print "REF: " $0
             found = 1
         }
     }
@@ -116,6 +130,18 @@ search_sector() {
     END {
         if (!found) {
             print "NO_MATCH: No sector found matching \"" q "\""
+            print ""
+            print "Available Sectors:"
+            print "  02 - Gemini (Linguistic Telemetry)"
+            print "  05 - GitHub (GraphQL Bridge)"
+            print "  06 - Firestore (Mobile Dashboard)"
+            print "  07 - Termux (Local Orchestration)"
+            print "  08 - AWS RHEL (Terminal History)"
+            print "  15 - Vader (Security/Audit)"
+            print "  17 - Flutter (Interview Prep)"
+            print "  18 - Turbo Dev (Build/Deploy)"
+            print "  19 - Expo (React Native)"
+            print "  20 - Mainframe Migration"
         }
     }
     ' "$MASTER_INDEX" 2>/dev/null || echo "NO_MATCH: MASTER-INDEX.md not found")
@@ -146,8 +172,37 @@ neural_jump() {
         # Numeric query (e.g., "17")
         sector_path=$(find "$SECTORS_DIR" -maxdepth 1 -type d -name "*$query*" 2>/dev/null | head -1)
     else
-        # Named query (e.g., "Vader", "AWS")
-        sector_path=$(find "$SECTORS_DIR" -maxdepth 1 -type d -iname "*$query*" 2>/dev/null | head -1)
+        # Named query (e.g., "Vader", "AWS", "Flutter")
+        # Map common names to sector directories
+        case "$query" in
+            [Ff]lutter*)
+                sector_path=$(find "$SECTORS_DIR" -maxdepth 1 -type d -name "*17*" 2>/dev/null | head -1)
+                ;;
+            [Ee]xpo*|[Rr]eact*)
+                sector_path=$(find "$SECTORS_DIR" -maxdepth 1 -type d -name "*19*" 2>/dev/null | head -1)
+                ;;
+            [Aa][Ww][Ss]*|[Rr][Hh][Ee][Ll]*)
+                sector_path=$(find "$SECTORS_DIR" -maxdepth 1 -type d -name "*08*" 2>/dev/null | head -1)
+                ;;
+            [Ff]irestore*)
+                sector_path=$(find "$SECTORS_DIR" -maxdepth 1 -type d -name "*06*" 2>/dev/null | head -1)
+                ;;
+            [Vv]ader*|[Ss]ecurity*|[Aa]udit*)
+                # Vader doesn't have a dedicated sector yet, point to security-related
+                log_warn "Vader sector not found — showing security-related content"
+                sector_path="$SECTORS_DIR"
+                ;;
+            [Mm]ainframe*)
+                sector_path=$(find "$SECTORS_DIR" -maxdepth 1 -type d -name "*20*" 2>/dev/null | head -1)
+                ;;
+            [Gg]emini*)
+                sector_path=$(find "$SECTORS_DIR" -maxdepth 1 -type d -name "*02*" 2>/dev/null | head -1)
+                ;;
+            *)
+                # Fallback to fuzzy search
+                sector_path=$(find "$SECTORS_DIR" -maxdepth 1 -type d -iname "*$query*" 2>/dev/null | head -1)
+                ;;
+        esac
     fi
     
     if [[ -n "$sector_path" && -d "$sector_path" ]]; then
@@ -157,7 +212,12 @@ neural_jump() {
         # Show sector info
         if [[ -f "$sector_path/README.md" ]]; then
             log_info "Sector README.md found"
-            head -20 "$sector_path/README.md" | grep -v "^$" | head -10
+            echo ""
+            head -30 "$sector_path/README.md" | grep -v "^$" | head -15
+            echo ""
+        elif [[ -d "$sector_path" ]]; then
+            log_info "Sector contents:"
+            ls -la "$sector_path" | head -15
             echo ""
         fi
         
@@ -174,6 +234,9 @@ neural_jump() {
         fi
     else
         log_warn "Sector directory not found for query: $query"
+        echo ""
+        echo "Available sector directories:"
+        ls -la "$SECTORS_DIR" | grep "^d" | awk '{print $NF}'
     fi
 }
 
