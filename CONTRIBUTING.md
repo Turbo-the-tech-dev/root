@@ -1,6 +1,24 @@
-# Contributing to Turbo-the-tech-dev Repositories
+# Contributing to Turbo-the-tech-dev Repositories 🚀
 
 Thank you for your interest in contributing! This document outlines guidelines for contributing to any repository in the [@Turbo-the-tech-dev](https://github.com/Turbo-the-tech-dev) organization.
+
+---
+
+## 📜 Workspace Contract (Blue Hat Standard)
+
+To ensure the root orchestration hub functions correctly, every sub-package in the `workspaces/` directory MUST implement the following scripts in its `package.json`:
+
+1.  **`test`**: Must run the package's unit tests. If no tests exist yet, it should be a no-op (e.g., `"test": "echo 'No tests yet'"`).
+2.  **`build`**: Must produce a build artifact if applicable. If the package does not require building (e.g., pure JS/TS library without transpilation), it should be a no-op.
+3.  **`lint`**: Must run a static analysis tool (e.g., `eslint` or `prettier`).
+
+### Root-Level Commands
+Always run commands from the project root using `turbo` for optimized, cached execution:
+```bash
+npm run build   # Builds all packages in topological order
+npm run test    # Runs all tests in parallel (if independent)
+npm run lint    # Runs all linters
+```
 
 ---
 
@@ -51,13 +69,6 @@ This organization uses [Conventional Commits](https://www.conventionalcommits.or
 | `refactor:` | Code restructuring without behavior change |
 | `test:` | Adding or updating tests |
 
-**Examples:**
-```
-feat: add conduit fill calculator for EMT
-fix: correct NEC 220.42 load calculation formula
-docs: update README with verified external links
-```
-
 ---
 
 ## Pull Request Process
@@ -75,23 +86,17 @@ docs: update README with verified external links
 ### Electrician-PROMPT-GENIE
 
 - Utility functions in `src/utils/` must be **pure** — no React imports.
-- Tests use CommonJS `require()` syntax (Jest).
 - Run `npm test` before submitting.
 
-### sovereign-circuit-academy (Flutter)
-
-- Follow feature-first architecture under `lib/features/`.
-- State management via Riverpod — do not introduce other state solutions.
-- Run `flutter test` before submitting.
-
-### Python Scripts (sovereign-circuit-academy)
-
-- Scripts must be standalone — no shared module dependencies.
-- Dependencies: `pandas`, `matplotlib` only.
-- Include a docstring explaining NEC article applicability.
+### Sub-projects
+- Each sub-project has its own directory and its own git repository (when managed by Turbo Fleet).
+- Always `cd` into the project directory before running project-specific commands.
 
 ---
 
 ## License
 
 By contributing, you agree that your contributions will be licensed under the same [MIT License](LICENSE) that covers this project.
+
+---
+*Maintained by Master Turbo & C-3PO*
