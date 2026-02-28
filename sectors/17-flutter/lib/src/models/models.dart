@@ -11,12 +11,92 @@
 /// =============================================================================
 
 import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 
 /// =============================================================================
-/// Question Model
+/// NECQuestion Model (Curtis Hayes Standard)
 /// =============================================================================
 
-/// Represents a single NEC 2026 interview question
+/// Core NEC question model — optimized for zero allocations
+@immutable
+class NECQuestion extends Equatable {
+  final String id;
+  final String codeSection; // e.g., "Article 250.64"
+  final String questionText;
+  final List<String> options;
+  final int correctIndex;
+  final String rationale;
+
+  const NECQuestion({
+    required this.id,
+    required this.codeSection,
+    required this.questionText,
+    required this.options,
+    required this.correctIndex,
+    required this.rationale,
+  });
+
+  /// Zero-unnecessary-allocation factory
+  factory NECQuestion.fromMap(Map<String, dynamic> map) {
+    return NECQuestion(
+      id: map['id'] as String,
+      codeSection: map['section'] as String,
+      questionText: map['text'] as String,
+      options: List<String>.from(map['options'] as List<dynamic>),
+      correctIndex: map['correctIndex'] as int,
+      rationale: map['rationale'] as String,
+    );
+  }
+
+  /// Convert to Map
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'section': codeSection,
+      'text': questionText,
+      'options': options,
+      'correctIndex': correctIndex,
+      'rationale': rationale,
+    };
+  }
+
+  /// Convert to Question (legacy compatibility)
+  Question toQuestion({
+    String category = 'NEC',
+    int necYear = 2023,
+    DifficultyLevel difficulty = DifficultyLevel.intermediate,
+    List<String> tags = const [],
+  }) {
+    return Question(
+      id: id,
+      text: questionText,
+      category: category,
+      necReference: codeSection,
+      necYear: necYear,
+      options: options,
+      correctIndex: correctIndex,
+      explanation: rationale,
+      difficulty: difficulty,
+      tags: tags,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+        id,
+        codeSection,
+        questionText,
+        options,
+        correctIndex,
+        rationale,
+      ];
+}
+
+/// =============================================================================
+/// Question Model (Extended with metadata)
+/// =============================================================================
+
+/// Represents a single NEC 2026 interview question with full metadata
 class Question extends Equatable {
   final String id;
   final String text;
@@ -43,6 +123,27 @@ class Question extends Equatable {
     this.isRequired = true,
     this.tags = const [],
   });
+
+  /// Factory from NECQuestion (upgrade path)
+  factory Question.fromNECQuestion(NECQuestion nec, {
+    String category = 'NEC',
+    int necYear = 2023,
+    DifficultyLevel difficulty = DifficultyLevel.intermediate,
+    List<String> tags = const [],
+  }) {
+    return Question(
+      id: nec.id,
+      text: nec.questionText,
+      category: category,
+      necReference: nec.codeSection,
+      necYear: necYear,
+      options: nec.options,
+      correctIndex: nec.correctIndex,
+      explanation: nec.rationale,
+      difficulty: difficulty,
+      tags: tags,
+    );
+  }
 
   /// Factory constructor from JSON (efficient parsing)
   factory Question.fromJson(Map<String, dynamic> json) {
