@@ -1,0 +1,59 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: turbo-fleet-staging
+
+namePrefix: staging-
+
+resources:
+  - ../../base
+
+images:
+  - name: ghcr.io/turbo-the-tech-dev/root/electrician
+    newTag: staging-latest
+
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 50m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 64Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: 250m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: 256Mi
+    target:
+      kind: Deployment
+      name: electrician
+
+  - patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 2
+      - op: replace
+        path: /spec/maxReplicas
+        value: 5
+    target:
+      kind: HorizontalPodAutoscaler
+      name: electrician
+
+  - patch: |-
+      - op: replace
+        path: /spec/minAvailable
+        value: 1
+    target:
+      kind: PodDisruptionBudget
+      name: electrician
+
+configMapGenerator:
+  - name: electrician-config
+    literals:
+      - NODE_ENV=staging
+      - LOG_LEVEL=debug

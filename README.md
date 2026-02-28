@@ -16,7 +16,8 @@ Welcome to the central repository for **Electrical Engineering, Field Operations
 - [Core Functionality](#core-functionality)
 - [API & Interface Documentation](#api--interface-documentation)
 - [Development & Testing](#development--testing)
-- [Internal Links](#internal-links)
+- [Repository Health](#repository-health)
+- [Quick Links](#quick-links)
 
 ---
 
@@ -101,10 +102,41 @@ npm run lint    # Run static analysis
 ---
 
 ## 🔗 Internal Links
-- [Master Index](MASTER-INDEX.md)
-- [Claude Workflow](CLAUDE.md)
-- [Contributing](CONTRIBUTING.md)
-- [License](LICENSE)
+
+| File | Purpose |
+|------|---------|
+| [Master Index](MASTER-INDEX.md) | Full repository catalog |
+| [Claude Workflow](CLAUDE.md) | AI-assisted development workflow |
+| [Contributing](CONTRIBUTING.md) | How to contribute |
+| [License](LICENSE) | MIT License |
+| [Banner](BANNER.md) | ASCII art and branding |
+| [Root Docs](root.md) | Additional root documentation |
+
+## 📊 Repository Health
+
+| Metric | Status |
+|--------|--------|
+| License | ✅ MIT |
+| CI/CD | ✅ GitHub Actions (5 workflows) |
+| Infrastructure | ✅ Terraform + Kubernetes + ArgoCD |
+| Monitoring | ✅ Prometheus + Grafana + Alertmanager |
+| Last Audit | 2026-02-28 |
+
+See [monthly-audit-response.md](monthly-audit-response.md) for detailed audit findings.
 
 ---
+
+## 🆘 Quick Links
+
+| Purpose | Link |
+|---------|------|
+| New here? | Start with [CONTRIBUTING.md](CONTRIBUTING.md) |
+| Deploying? | See [IMPERIAL_PUSH.md](IMPERIAL_PUSH.md) |
+| DevOps? | Check [DEVOPS.md](DEVOPS.md) |
+| GitOps? | Read [GITOPS_QUICKSTART.md](GITOPS_QUICKSTART.md) |
+| Full catalog | [MASTER-INDEX.md](MASTER-INDEX.md) |
+
+---
+
 *Maintained by Master Turbo & C-3PO | Repository Status: 151% OPERATIONAL*
+*Last infrastructure update: 2026-02-28 — Marcus Hale approved*

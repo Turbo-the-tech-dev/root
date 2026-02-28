@@ -1,0 +1,54 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: turbo-fleet-production
+
+namePrefix: prod-
+
+resources:
+  - ../../base
+
+images:
+  - name: ghcr.io/turbo-the-tech-dev/root/electrician
+    newTag: production-latest
+
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 5
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 200m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 256Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: 1000m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: 1Gi
+      - op: add
+        path: /spec/template/spec/affinity/podAntiAffinity/preferredDuringSchedulingIgnoredDuringExecution/0/weight
+        value: 100
+    target:
+      kind: Deployment
+      name: electrician
+
+  - patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 5
+      - op: replace
+        path: /spec/maxReplicas
+        value: 20
+    target:
+      kind: HorizontalPodAutoscaler
+      name: electrician
+
+configMapGenerator:
+  - name: electrician-config
+    literals:
+      - NODE_ENV=production
+      - LOG_LEVEL=info

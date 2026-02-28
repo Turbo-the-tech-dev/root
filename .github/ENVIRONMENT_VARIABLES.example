@@ -1,0 +1,12 @@
+# GitHub Actions Environment Variables
+# Configure these in GitHub Settings > Environments
+
+# Staging Environment Variables:
+AWS_ROLE_ARN=arn:aws:iam::123456789012:role/turbo-fleet-github-actions-staging
+S3_BUCKET_NAME=turbo-fleet-static-staging-123456789012
+CLOUDFRONT_DISTRIBUTION_ID=E1234567890ABC
+
+# Production Environment Variables:
+AWS_ROLE_ARN=arn:aws:iam::123456789012:role/turbo-fleet-github-actions-production
+S3_BUCKET_NAME=turbo-fleet-static-production-123456789012
+CLOUDFRONT_DISTRIBUTION_ID=E0987654321DEF
