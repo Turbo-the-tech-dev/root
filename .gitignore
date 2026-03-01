@@ -1,6 +1,36 @@
-node_modules
-.turbo
-dist
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Turborepo & Build Artifacts
+.turbo/
+dist/
+build/
+.next/
+out/
+
+# Environment & Secrets
 .env
+.env.*
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+
+# System Files
 .DS_Store
+Thumbs.db
 *.log
+
+# Project Specific
+logs/
+temp/
+/data/data/com.termux/files/home/.gemini/tmp/

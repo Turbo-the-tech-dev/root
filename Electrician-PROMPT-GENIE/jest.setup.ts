@@ -2,30 +2,10 @@
 // Global test configuration
 
 import '@testing-library/jest-dom';
-
-// Mock Firebase
-jest.mock('firebase/app', () => ({
-  initializeApp: jest.fn(),
-  getApps: jest.fn(),
-  getApp: jest.fn(),
-}));
-
-jest.mock('firebase/firestore', () => ({
-  getFirestore: jest.fn(),
-  collection: jest.fn(),
-  doc: jest.fn(),
-  getDoc: jest.fn(),
-  setDoc: jest.fn(),
-}));
-
-// Mock Riverpod
-jest.mock('flutter_riverpod', () => ({
-  Provider: jest.fn(),
-  StateNotifierProvider: jest.fn(),
-  FutureProvider: jest.fn(),
-  StreamProvider: jest.fn(),
-  StateProvider: jest.fn(),
-}));
+import { jest } from '@jest/globals';
+import { TextEncoder, TextDecoder } from 'util';
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder as any;
 
 // Global test timeout
 jest.setTimeout(30000);

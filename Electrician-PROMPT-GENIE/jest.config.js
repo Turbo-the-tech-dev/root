@@ -1,4 +1,4 @@
-# Jest Configuration for Electrician-PROMPT-GENIE
+// Jest Configuration for Electrician-PROMPT-GENIE
 // @ts-check
 
 /** @type {import('jest').Config} */
@@ -25,6 +25,7 @@ const config = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
   },
   transform: {
     '^.+\\.tsx?$': [
@@ -33,6 +34,7 @@ const config = {
         tsconfig: {
           jsx: 'react',
         },
+        isolatedModules: true,
       },
     ],
   },

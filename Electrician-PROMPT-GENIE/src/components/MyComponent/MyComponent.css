@@ -1,0 +1,11 @@
+.my-component {
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  text-align: center;
+  background-color: #f9f9f9;
+}
+
+.my-component h1 {
+  color: #333;
+}
