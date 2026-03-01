@@ -1,0 +1,56 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: electrician-production
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: electrician
+    app.kubernetes.io/part-of: turbo-fleet
+    environment: production
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    notifications.argoproj.io/subscribe.on-deployed.slack: turbo-fleet-deployments
+    notifications.argoproj.io/subscribe.on-health-degraded.slack: turbo-fleet-incidents
+spec:
+  project: turbo-fleet
+
+  source:
+    repoURL: https://github.com/Turbo-the-tech-dev/root.git
+    targetRevision: HEAD
+    path: k8s/overlays/production
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: turbo-fleet-production
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: false  # Manual approval for production
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 5m
+
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+
+  info:
+    - name: URL
+      value: https://fleet.turbo.dev
+    - name: Slack
+      value: '#ops-production'
+    - name: PagerDuty
+      value: 'turbo-fleet-production'

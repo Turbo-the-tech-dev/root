@@ -1,0 +1,179 @@
+# =============================================================================
+# Main CI/CD Pipeline - Turbo Fleet
+# Triggers on push and PR, runs tests, builds, and deploys
+# =============================================================================
+
+name: Turbo Fleet CI/CD 🚀
+
+on:
+  push:
+    branches: [main, develop]
+    tags: ['v*']
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+        default: staging
+
+# Prevent concurrent workflows on the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ===========================================================================
+  # Stage 1: Validation
+  # ===========================================================================
+
+  validate:
+    name: Validate Repository Structure
+    runs-on: ubuntu-latest
+    outputs:
+      workspaces: ${{ steps.discover.outputs.workspaces }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Discover workspaces
+        id: discover
+        run: |
+          WORKSPACES=$(find . -maxdepth 2 -name "package.json" -not -path "./node_modules/*" | \
+            xargs -I {} dirname {} | \
+            sed 's|^\./||' | \
+            jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "workspaces=$WORKSPACES" >> $GITHUB_OUTPUT
+
+      - name: Validate Terraform
+        working-directory: sectors/08-aws/infrastructure
+        run: |
+          terraform fmt -check -recursive || true
+          terraform init -backend=false
+          terraform validate
+
+  # ===========================================================================
+  # Stage 2: Test All Workspaces (Parallel)
+  # ===========================================================================
+
+  test-electrician:
+    name: Test Electrician-PROMPT-GENIE ⚡
+    needs: validate
+    uses: ./.github/workflows/reusable-test.yml
+    with:
+      workspace: Electrician-PROMPT-GENIE
+      node_version: '20'
+      coverage_required: true
+
+  test-deathstar:
+    name: Test DEATHSTAR 💀
+    needs: validate
+    uses: ./.github/workflows/reusable-test.yml
+    with:
+      workspace: DEATHSTAR
+      node_version: '20'
+      coverage_required: true
+
+  # ===========================================================================
+  # Stage 3: Security Scan
+  # ===========================================================================
+
+  security-scan:
+    name: Security Scan 🔒
+    needs: validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Run npm audit
+        run: |
+          npm audit --audit-level=high --json || true
+
+  # ===========================================================================
+  # Stage 4: Build & Deploy (Only on main branch or manual trigger)
+  # ===========================================================================
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: [test-electrician, test-deathstar, security-scan]
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/reusable-deploy.yml
+    with:
+      workspace: Electrician-PROMPT-GENIE
+      environment: staging
+      build_output_dir: dist
+    secrets: inherit
+
+  deploy-production:
+    name: Deploy to Production
+    needs: deploy-staging
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production'
+    uses: ./.github/workflows/reusable-deploy.yml
+    with:
+      workspace: Electrician-PROMPT-GENIE
+      environment: production
+      build_output_dir: dist
+    secrets: inherit
+
+  # ===========================================================================
+  # Stage 5: Post-Deployment Verification
+  # ===========================================================================
+
+  smoke-test:
+    name: Smoke Test
+    needs: deploy-staging
+    if: always() && needs.deploy-staging.result == 'success'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Smoke test endpoint
+        run: |
+          curl -f ${{ needs.deploy-staging.outputs.s3_uri }} || exit 1
+
+  # ===========================================================================
+  # Notifications
+  # ===========================================================================
+
+  notify:
+    name: Notify
+    needs: [deploy-staging, deploy-production]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "Deployment ${{ needs.deploy-staging.result }}",
+              "environment": "${{ github.event.inputs.environment || 'staging' }}",
+              "commit": "${{ github.sha }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: ${{ env.SLACK_WEBHOOK_URL != '' }}

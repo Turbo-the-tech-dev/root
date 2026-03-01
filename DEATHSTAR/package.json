@@ -1,0 +1,15 @@
+{
+  "name": "deathstar",
+  "version": "1.0.0",
+  "description": "DEATHSTAR scoring utility",
+  "scripts": {
+    "test": "tsx --test *.test.ts",
+    "build": "echo 'No build step required for DEATHSTAR'",
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.2",
+    "tsx": "^4.7.0",
+    "typescript": "^5.0.0"
+  }
+}

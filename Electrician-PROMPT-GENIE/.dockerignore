@@ -1,0 +1,36 @@
+# Dependencies
+node_modules
+npm-debug.log
+
+# Build output
+dist
+build
+.next
+
+# Logs
+logs
+*.log
+
+# Environment
+.env
+.env.local
+.env.production
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+coverage
+.nyc_output
+
+# Terraform (keep out of images)
+*.tfstate
+*.tfstate.*
+.terraform/

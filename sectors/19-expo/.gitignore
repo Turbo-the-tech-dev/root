@@ -1,0 +1,42 @@
+# Expo / EAS Build Configuration
+
+# Dependencies
+node_modules/
+npm-debug.log
+
+# Build outputs
+dist/
+build/
+*.apk
+*.aab
+*.ipa
+*.app
+*.xcarchive
+
+# EAS
+.eas/
+*.log
+
+# Environment
+.env
+.env.local
+.env.production
+.expo/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+
+# Code signing (NEVER commit these)
+code-signing/
+*.pem
+*.p12
+google-service-account-key.json

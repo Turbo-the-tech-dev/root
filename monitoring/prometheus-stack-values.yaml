@@ -1,0 +1,247 @@
+# Prometheus Stack Helm Values - Turbo Fleet Monitoring
+# Install with: helm install monitoring prometheus-community/kube-prometheus-stack -f prometheus-stack-values.yaml -n monitoring --create-namespace
+
+kube-prometheus-stack:
+  fullnameOverride: prometheus
+
+  # ============================================
+  # Grafana Configuration
+  # ============================================
+  grafana:
+    adminPassword: admin  # Change in production via secrets
+    dashboardProviders:
+      dashboardproviders.yaml:
+        apiVersion: 1
+        providers:
+          - name: default
+            folder: ''
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/default
+    dashboards:
+      default:
+        node-exporter-full:
+          gnetId: 1860
+          revision: 30
+          datasource: Prometheus
+        kubernetes-cluster:
+          gnetId: 6417
+          revision: 1
+          datasource: Prometheus
+        pod-monitoring:
+          gnetId: 15760
+          revision: 1
+          datasource: Prometheus
+    sidecar:
+      dashboards:
+        enabled: true
+        searchNamespace: ALL
+      datasources:
+        enabled: true
+    persistence:
+      enabled: true
+      storageClassName: gp3
+      size: 10Gi
+
+  # ============================================
+  # Prometheus Configuration
+  # ============================================
+  prometheus:
+    prometheusSpec:
+      retention: 30d
+      retentionSize: 50GB
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: gp3
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 50Gi
+      resources:
+        requests:
+          cpu: 500m
+          memory: 512Mi
+        limits:
+          cpu: 2000m
+          memory: 4Gi
+      serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false
+      probeSelectorNilUsesHelmValues: false
+      additionalScrapeConfigs:
+        - job_name: 'electrician'
+          kubernetes_sd_configs:
+            - role: pod
+              namespaces:
+                names:
+                  - turbo-fleet-staging
+                  - turbo-fleet-production
+          relabel_configs:
+            - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+              action: keep
+              regex: electrician
+            - source_labels: [__meta_kubernetes_pod_phase]
+              action: keep
+              regex: Running
+
+  # ============================================
+  # Alertmanager Configuration
+  # ============================================
+  alertmanager:
+    enabled: true
+    alertmanagerSpec:
+      storage:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: gp3
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 5Gi
+      resources:
+        requests:
+          cpu: 100m
+          memory: 100Mi
+        limits:
+          cpu: 200m
+          memory: 200Mi
+    config:
+      global:
+        resolve_timeout: 5m
+        slack_api_url_file: /etc/alertmanager/secrets/slack-webhook
+        pagerduty_url: https://events.pagerduty.com/v2/enqueue
+      route:
+        group_by: ['alertname', 'namespace', 'severity']
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 4h
+        receiver: slack-warnings
+        routes:
+          - match:
+              severity: critical
+            receiver: pagerduty
+            repeat_interval: 5m
+            continue: true
+          - match:
+              severity: warning
+            receiver: slack-warnings
+            repeat_interval: 30m
+          - match:
+              severity: info
+            receiver: slack-info
+            repeat_interval: 1h
+      receivers:
+        - name: pagerduty
+          pagerduty_configs:
+            - routing_key_file: /etc/alertmanager/secrets/pagerduty-routing-key
+              severity: critical
+              description: '{{ .CommonAnnotations.summary }}'
+        - name: slack-critical
+          slack_configs:
+            - channel: '#incidents'
+              send_resolved: true
+              title: '[CRITICAL] {{ .CommonAnnotations.summary }}'
+              text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+        - name: slack-warnings
+          slack_configs:
+            - channel: '#ops-warnings'
+              send_resolved: true
+              title: '[WARNING] {{ .CommonAnnotations.summary }}'
+        - name: slack-info
+          slack_configs:
+            - channel: '#ops-info'
+              send_resolved: true
+              title: '[INFO] {{ .CommonAnnotations.summary }}'
+      templates:
+        - '/etc/alertmanager/config/*.tmpl'
+
+  # ============================================
+  # Node Exporter
+  # ============================================
+  nodeExporter:
+    enabled: true
+    resources:
+      requests:
+        cpu: 100m
+        memory: 30Mi
+      limits:
+        cpu: 200m
+        memory: 50Mi
+
+  # ============================================
+  # Kube State Metrics
+  # ============================================
+  kubeStateMetrics:
+    enabled: true
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+
+  # ============================================
+  # Custom Alerting Rules
+  # ============================================
+  additionalPrometheusRulesMap:
+    turbo-fleet-alerts:
+      groups:
+        - name: turbo-fleet-critical
+          interval: 30s
+          rules:
+            - alert: PodCrashLooping
+              expr: rate(kube_pod_container_status_restarts_total{namespace=~"turbo-fleet.*"}[15m]) * 60 * 5 > 0
+              for: 5m
+              labels:
+                severity: critical
+              annotations:
+                summary: "Pod {{ $labels.pod }} is crash looping"
+                description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is restarting {{ $value }} times per hour"
+
+            - alert: PodNotReady
+              expr: kube_pod_status_ready{namespace=~"turbo-fleet.*", condition="true"} == 0
+              for: 5m
+              labels:
+                severity: warning
+              annotations:
+                summary: "Pod {{ $labels.pod }} is not ready"
+                description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} has been not ready for 5 minutes"
+
+            - alert: HighMemoryUsage
+              expr: container_memory_usage_bytes{namespace=~"turbo-fleet.*"} / container_spec_memory_limit_bytes{namespace=~"turbo-fleet.*"} > 0.9
+              for: 5m
+              labels:
+                severity: warning
+              annotations:
+                summary: "High memory usage in {{ $labels.pod }}"
+                description: "Memory usage is {{ $value | humanizePercentage }} of limit"
+
+            - alert: HighCPUUsage
+              expr: rate(container_cpu_usage_seconds_total{namespace=~"turbo-fleet.*"}[5m]) / container_spec_cpu_quota{namespace=~"turbo-fleet.*"} * 100000 > 0.9
+              for: 10m
+              labels:
+                severity: warning
+              annotations:
+                summary: "High CPU usage in {{ $labels.pod }}"
+                description: "CPU usage is {{ $value | humanizePercentage }} of limit"
+
+            - alert: DeploymentReplicasMismatch
+              expr: kube_deployment_spec_replicas{namespace=~"turbo-fleet.*"} != kube_deployment_status_replicas_available{namespace=~"turbo-fleet.*"}
+              for: 10m
+              labels:
+                severity: warning
+              annotations:
+                summary: "Deployment {{ $labels.deployment }} has replica mismatch"
+                description: "Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has {{ $value }} available replicas, expected {{ $labels.kube_deployment_spec_replicas }}"
+
+            - alert: PVCCritical
+              expr: kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes < 0.1
+              for: 5m
+              labels:
+                severity: critical
+              annotations:
+                summary: "PVC {{ $labels.persistentvolumeclaim }} is almost full"
+                description: "Only {{ $value | humanizePercentage }} storage left"

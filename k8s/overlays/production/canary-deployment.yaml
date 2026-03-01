@@ -1,0 +1,64 @@
+# Canary Deployment for Production
+# Used by Argo Rollouts for progressive delivery
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: electrician-canary
+  namespace: turbo-fleet-production
+  labels:
+    app.kubernetes.io/name: electrician
+    app.kubernetes.io/managed-by: argocd
+spec:
+  replicas: 5
+  strategy:
+    canary:
+      steps:
+        - setWeight: 10
+        - pause: {duration: 5m}
+        - setWeight: 25
+        - pause: {duration: 5m}
+        - setWeight: 50
+        - pause: {duration: 10m}
+        - setWeight: 75
+        - pause: {duration: 5m}
+        - setWeight: 100
+      analysis:
+        templates:
+          - templateName: success-rate
+        startingStep: 1
+        args:
+          - name: service-name
+            value: electrician
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: electrician
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: electrician
+    spec:
+      containers:
+        - name: electrician
+          image: ghcr.io/turbo-the-tech-dev/root/electrician:canary
+          ports:
+            - containerPort: 3000
+              name: http
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
