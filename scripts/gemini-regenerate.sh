@@ -129,17 +129,10 @@ call_gemini_api() {
     response=$(curl -s -X POST "${GEMINI_API_URL}/${GEMINI_MODEL}:generateContent" \
         -H "Content-Type: application/json" \
         -H "x-goog-api-key: ${GEMINI_API_KEY}" \
-        -d "{
-            \"contents\": [{
-                \"parts\": [{
-                    \"text\": \"${prompt}\"
-                }]
-            }],
-            \"generationConfig\": {
-                \"temperature\": 0.7,
-                \"maxOutputTokens\": 4096
-            }
-        }")
+        -d "$(jq -n --arg prompt "$prompt" '{
+            contents: [{parts: [{text: $prompt}]}],
+            generationConfig: {temperature: 0.7, maxOutputTokens: 4096}
+        }')")
 
     # Extract content from response
     content=$(echo "${response}" | jq -r '.candidates[0].content.parts[0].text // empty')

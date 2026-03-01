@@ -93,7 +93,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     if command -v rclone &> /dev/null; then
         rclone copy "$STAGING_DIR" "$PRODUCTION_DIR" --verbose
     else
-        cp -r "$STAGING_DIR"/* "$PRODUCTION_DIR"/ 2>/dev/null || true
+        rsync -av --ignore-existing --exclude='.git' "$STAGING_DIR"/ "$PRODUCTION_DIR"/ 2>/dev/null || true
     fi
     
     # Log the merge
@@ -107,7 +107,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     # Trigger post-merge purge
     if [ -f ./Sector-18-Turbo-Dev/imperial-purge.sh ]; then
         echo "  Running dependency sync..."
-        bash ./Sector-18-Turbo-Dev/imperial-purge.sh <<< "n" 2>/dev/null || true
+        bash ./Sector-18-Turbo-Dev/imperial-purge.sh <<< "y" 2>/dev/null || true
     fi
     
     echo ""
