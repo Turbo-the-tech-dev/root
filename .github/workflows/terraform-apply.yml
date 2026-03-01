@@ -1,0 +1,117 @@
+# =============================================================================
+# Terraform Apply - Infrastructure Deployment
+# Runs on merge to main, deploys infrastructure changes
+# =============================================================================
+
+name: Terraform Apply 🚀
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'sectors/08-aws/infrastructure/**/*.tf'
+      - 'sectors/08-aws/infrastructure/**/*.tfvars'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+        default: staging
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  terraform-apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'staging' }}
+    defaults:
+      run:
+        working-directory: sectors/08-aws/infrastructure
+
+    outputs:
+      static_bucket_name: ${{ steps.output.outputs.static_bucket_name }}
+      cloudfront_distribution_id: ${{ steps.output.outputs.cloudfront_distribution_id }}
+      cloudfront_distribution_url: ${{ steps.output.outputs.cloudfront_distribution_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.0
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: github-actions-terraform-apply
+          aws-region: us-east-1
+
+      - name: Terraform Init
+        run: terraform init -backend-config="bucket=turbo-fleet-terraform-state" -backend-config="key=infrastructure/terraform.tfstate" -backend-config="region=us-east-1" -reconfigure
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+        continue-on-error: true
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Select Variables File
+        id: vars
+        run: |
+          if [[ "${{ github.event.inputs.environment || 'staging' }}" == "production" ]]; then
+            echo "TF_VARS=terraform.tfvars.production" >> $GITHUB_OUTPUT
+          else
+            echo "TF_VARS=terraform.tfvars" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -var-file=${{ steps.vars.outputs.TF_VARS }} -no-color -out=tfplan
+
+      - name: Terraform Apply
+        id: apply
+        run: |
+          terraform apply -auto-approve tfplan
+          echo "apply_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Capture Outputs
+        id: output
+        if: steps.apply.outputs.apply_complete == 'true'
+        run: |
+          echo "static_bucket_name=$(terraform output -raw static_bucket_name)" >> $GITHUB_OUTPUT
+          echo "cloudfront_distribution_id=$(terraform output -raw cloudfront_distribution_id)" >> $GITHUB_OUTPUT
+          echo "cloudfront_distribution_url=$(terraform output -raw cloudfront_distribution_url)" >> $GITHUB_OUTPUT
+          echo "github_actions_role_arn=$(terraform output -raw github_actions_role_arn)" >> $GITHUB_OUTPUT
+
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v1
+        if: always()
+        with:
+          payload: |
+            {
+              "text": "Terraform Apply ${{ steps.apply.outcome }}",
+              "environment": "${{ github.event.inputs.environment || 'staging' }}",
+              "cloudfront_url": "${{ steps.output.outputs.cloudfront_distribution_url }}",
+              "commit": "${{ github.sha }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Upload State Snapshot
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: terraform-state-snapshot
+          path: sectors/08-aws/infrastructure/.terraform/
+          retention-days: 30

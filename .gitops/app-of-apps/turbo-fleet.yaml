@@ -1,0 +1,59 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: turbo-fleet
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: turbo-fleet
+spec:
+  generators:
+    - list:
+        elements:
+          - environment: staging
+            cluster: in-cluster
+            namespace: turbo-fleet-staging
+            path: k8s/overlays/staging
+            autoSync: "true"
+          - environment: production
+            cluster: in-cluster
+            namespace: turbo-fleet-production
+            path: k8s/overlays/production
+            autoSync: "false"
+  template:
+    metadata:
+      name: 'electrician-{{environment}}'
+      namespace: argocd
+      labels:
+        app.kubernetes.io/name: electrician
+        environment: '{{environment}}'
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: turbo-fleet
+      source:
+        repoURL: https://github.com/Turbo-the-tech-dev/root.git
+        targetRevision: HEAD
+        path: '{{path}}'
+      destination:
+        server: '{{cluster}}'
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: {{autoSync}}
+          allowEmpty: false
+        syncOptions:
+          - CreateNamespace=true
+          - PrunePropagationPolicy=foreground
+          - PruneLast=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
+      ignoreDifferences:
+        - group: apps
+          kind: Deployment
+          jsonPointers:
+            - /spec/replicas

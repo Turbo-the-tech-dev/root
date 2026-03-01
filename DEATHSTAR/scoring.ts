@@ -13,17 +13,20 @@ export function calculateScore(transcription: string, keywords: string[]): numbe
 
   // Convert transcription to lowercase for case-insensitive matching
   const lowerTranscription = transcription.toLowerCase();
+  
+  // Use a Set for unique, lowercase keywords to optimize scoring
+  const uniqueKeywords = [...new Set(keywords.map(k => k.toLowerCase()))];
 
-  // Count how many keywords are found (as substrings)
+  // Count how many unique keywords are found (as substrings)
   let matchCount = 0;
-  for (const keyword of keywords) {
-    if (lowerTranscription.includes(keyword.toLowerCase())) {
+  for (const keyword of uniqueKeywords) {
+    if (lowerTranscription.includes(keyword)) {
       matchCount++;
     }
   }
 
-  // Calculate percentage score
-  const score = (matchCount / keywords.length) * 100;
+  // Calculate percentage score based on unique keywords
+  const score = (matchCount / uniqueKeywords.length) * 100;
   
   return score;
 }

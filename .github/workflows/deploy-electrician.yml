@@ -1,0 +1,224 @@
+# =============================================================================
+# Deploy Electrician - Flutter Web App
+# Builds and deploys the Electrician interview app to S3/CloudFront
+# =============================================================================
+
+name: Deploy Electrician ⚡
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Electrician-PROMPT-GENIE/**'
+      - 'sectors/17-flutter/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'Electrician-PROMPT-GENIE/**'
+      - 'sectors/17-flutter/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+        default: staging
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  FLUTTER_VERSION: '3.19.0'
+  BUILD_OUTPUT: build/web
+
+jobs:
+  # ===========================================================================
+  # Stage 1: Code Audit via Claude
+  # ===========================================================================
+
+  claude-audit:
+    name: Claude Code Audit
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get PR Diff
+        id: diff
+        run: |
+          git fetch origin main
+          git diff origin/main...HEAD > diff.txt
+          echo "diff_size=$(wc -c < diff.txt)" >> $GITHUB_OUTPUT
+
+      - name: Claude Code Review
+        if: steps.diff.outputs.diff_size > 0
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_config: |
+            {
+              "allowedTools": ["Read", "Grep"],
+              "maxExecutions": 1
+            }
+          prompt: |
+            Review this diff for NEC 2026 compliance and Flutter best practices.
+            Check for:
+            1. Hardcoded paths or credentials
+            2. Missing error handling
+            3. Riverpod state management patterns
+            4. GoRouter navigation setup
+            
+            ${ diff.txt }
+
+  # ===========================================================================
+  # Stage 2: Build Flutter Web
+  # ===========================================================================
+
+  build:
+    name: Build Flutter Web
+    runs-on: ubuntu-latest
+    needs: claude-audit
+    if: always() && (needs.claude-audit.result == 'success' || needs.claude-audit.result == 'skipped')
+    
+    outputs:
+      build_hash: ${{ steps.build_info.outputs.hash }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: Flutter Version
+        run: flutter --version
+
+      - name: Get Dependencies
+        working-directory: Electrician-PROMPT-GENIE
+        run: flutter pub get
+
+      - name: Run Tests
+        working-directory: Electrician-PROMPT-GENIE
+        run: flutter test
+
+      - name: Analyze
+        working-directory: Electrician-PROMPT-GENIE
+        run: flutter analyze
+
+      - name: Build Web
+        working-directory: Electrician-PROMPT-GENIE
+        run: flutter build web --release --dart-define=ENVIRONMENT=${{ github.event.inputs.environment || 'staging' }}
+
+      - name: Capture Build Info
+        id: build_info
+        run: |
+          echo "hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-web-build
+          path: Electrician-PROMPT-GENIE/${{ env.BUILD_OUTPUT }}
+          retention-days: 7
+
+  # ===========================================================================
+  # Stage 3: Deploy to S3
+  # ===========================================================================
+
+  deploy:
+    name: Deploy to S3
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name != 'pull_request'
+    environment: ${{ github.event.inputs.environment || 'staging' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: flutter-web-build
+          path: ./build-output
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: github-actions-deploy
+          aws-region: us-east-1
+
+      - name: Deploy to S3
+        id: deploy
+        env:
+          S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}
+        run: |
+          aws s3 sync ./build-output/ s3://$S3_BUCKET/ \
+            --delete \
+            --cache-control "public,max-age=31536000,immutable"
+          
+          # HTML files should not be cached
+          aws s3 cp s3://$S3_BUCKET/index.html s3://$S3_BUCKET/index.html \
+            --cache-control "public,max-age=0,must-revalidate"
+          
+          echo "deployed=true" >> $GITHUB_OUTPUT
+
+      - name: Invalidate CloudFront
+        if: steps.deploy.outputs.deployed == 'true'
+        env:
+          CLOUDFRONT_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id $CLOUDFRONT_ID \
+            --paths "/*"
+
+      - name: Wait for Invalidation
+        if: steps.deploy.outputs.deployed == 'true'
+        env:
+          CLOUDFRONT_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          INVALIDATION_ID=$(aws cloudfront create-invalidation \
+            --distribution-id $CLOUDFRONT_ID \
+            --paths "/*" \
+            --query 'Invalidation.Id' \
+            --output text)
+          
+          aws cloudfront wait invalidation-completed \
+            --distribution-id $CLOUDFRONT_ID \
+            --id $INVALIDATION_ID
+          
+          echo "✅ CloudFront invalidation complete"
+
+      - name: Smoke Test
+        if: steps.deploy.outputs.deployed == 'true'
+        env:
+          DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+        run: |
+          echo "Testing deployment at $DEPLOY_URL"
+          curl -f --retry 5 --retry-delay 10 "$DEPLOY_URL" || exit 1
+          echo "✅ Smoke test passed"
+
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v1
+        if: always()
+        with:
+          payload: |
+            {
+              "text": "Electrician Deploy ${{ steps.deploy.outcome }}",
+              "environment": "${{ github.event.inputs.environment || 'staging' }}",
+              "build_hash": "${{ needs.build.outputs.build_hash }}",
+              "commit": "${{ github.sha }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

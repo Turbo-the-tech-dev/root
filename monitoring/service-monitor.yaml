@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: electrician
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: electrician
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: electrician
+  namespaceSelector:
+    matchNames:
+      - turbo-fleet-staging
+      - turbo-fleet-production
+  endpoints:
+    - port: http
+      interval: 30s
+      path: /metrics
+      scrapeTimeout: 10s
