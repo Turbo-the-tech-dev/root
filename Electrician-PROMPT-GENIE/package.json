@@ -3,15 +3,23 @@
   "version": "1.0.0",
   "description": "Electrician Prompt Genie",
   "scripts": {
-    "test": "tsx --test *.test.tsx"
+    "test": "tsx --test *.test.tsx",
+    "test:coverage": "tsx --test --test-reporter=spec --experimental-test-coverage",
+    "test:watch": "tsx --test --watch",
+    "build": "echo 'No build step required for PROMPT-GENIE'",
+    "lint": "tsc --noEmit"
   },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
+    "@types/node": "^25.3.2",
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
+    "@jest/globals": "^29.7.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.0",
     "tsx": "^4.7.0",
     "typescript": "^5.0.0"
   }

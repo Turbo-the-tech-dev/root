@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>root — Turbo Fleet Command</title>
+<style>
+:root{
+  --bg-primary:#0d1117;
+  --bg-secondary:#161b22;
+  --bg-tertiary:#1f2937;
+  --border-default:#21262d;
+  --border-hover:#30363d;
+  --text-primary:#c9d1d9;
+  --text-secondary:#8b949e;
+  --text-muted:#484f58;
+  --accent-blue:#58a6ff;
+  --accent-green:#238636;
+  --accent-purple:#8b5cf6;
+  --accent-orange:#f0883e;
+  --accent-green-border:#3fb950;
+  --gradient-1:linear-gradient(135deg,#58a6ff 0%,#8b5cf6 100%);
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg:0 8px 24px rgba(0,0,0,0.5);
+  --transition-fast:150ms cubic-bezier(0.4,0,0.2,1);
+  --transition-normal:250ms cubic-bezier(0.4,0,0.2,1);
+  --transition-slow:400ms cubic-bezier(0.4,0,0.2,1);
+  --radius-sm:6px;
+  --radius-md:8px;
+  --radius-lg:12px;
+  --radius-xl:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg-primary);
+  color:var(--text-primary);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  line-height:1.6;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+.container{
+  max-width:900px;
+  margin:0 auto;
+  padding:2rem 1.5rem;
+  width:100%;
+  flex:1;
+}
+/* Header Styles */
+header{
+  border-bottom:1px solid var(--border-default);
+  padding-bottom:1.5rem;
+  margin-bottom:2rem;
+  animation:fadeInDown var(--transition-slow) ease-out;
+}
+.header-content{
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+}
+h1{
+  color:var(--accent-blue);
+  font-size:2.25rem;
+  font-weight:700;
+  margin:0;
+  background:var(--gradient-1);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  letter-spacing:-0.02em;
+  animation:glow 3s ease-in-out infinite;
+}
+@keyframes glow{
+  0%,100%{filter:drop-shadow(0 0 4px rgba(88,166,255,0.3));}
+  50%{filter:drop-shadow(0 0 8px rgba(88,166,255,0.5));}
+}
+.badges{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.5rem;
+  align-items:center;
+}
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:0.25rem;
+  background:var(--bg-tertiary);
+  color:var(--text-primary);
+  padding:0.25rem 0.75rem;
+  border-radius:var(--radius-lg);
+  font-size:0.75rem;
+  font-weight:500;
+  border:1px solid var(--border-default);
+  transition:all var(--transition-fast);
+}
+.badge:hover{
+  transform:translateY(-1px);
+  box-shadow:var(--shadow-sm);
+}
+.badge.fleet{
+  background:var(--accent-green);
+  color:#fff;
+  border-color:var(--accent-green);
+}
+.badge.tech{
+  background:var(--accent-purple);
+  color:#fff;
+  border-color:var(--accent-purple);
+}
+.description{
+  color:var(--text-secondary);
+  font-size:1.1rem;
+  line-height:1.7;
+  max-width:600px;
+}
+/* Links */
+.links{
+  display:flex;
+  gap:0.75rem;
+  flex-wrap:wrap;
+  margin-top:0.5rem;
+}
+.links a{
+  color:var(--accent-blue);
+  text-decoration:none;
+  padding:0.5rem 1rem;
+  border:1px solid var(--border-default);
+  border-radius:var(--radius-sm);
+  font-size:0.875rem;
+  font-weight:500;
+  background:var(--bg-secondary);
+  transition:all var(--transition-fast);
+  display:inline-flex;
+  align-items:center;
+  gap:0.5rem;
+}
+.links a::before{
+  content:'→';
+  opacity:0;
+  transform:translateX(-4px);
+  transition:all var(--transition-fast);
+}
+.links a:hover{
+  background:var(--bg-tertiary);
+  border-color:var(--accent-blue);
+  box-shadow:0 0 0 3px rgba(88,166,255,0.1);
+  transform:translateY(-2px);
+}
+.links a:hover::before{
+  opacity:1;
+  transform:translateX(0);
+}
+/* Content Area */
+.content{
+  background:var(--bg-secondary);
+  border:1px solid var(--border-default);
+  border-radius:var(--radius-md);
+  padding:2rem;
+  margin-top:1.5rem;
+  animation:fadeInUp var(--transition-slow) ease-out;
+  transition:border-color var(--transition-normal);
+}
+.content:hover{
+  border-color:var(--border-hover);
+}
+@keyframes fadeInDown{
+  from{opacity:0;transform:translateY(-20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes fadeInUp{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.content h2{
+  color:var(--accent-blue);
+  margin:1.5rem 0 0.75rem;
+  font-size:1.5rem;
+  font-weight:600;
+  border-bottom:1px solid var(--border-default);
+  padding-bottom:0.5rem;
+  scroll-margin-top:2rem;
+}
+.content h2:first-child{margin-top:0}
+.content h3{
+  color:var(--accent-purple);
+  margin:1.2rem 0 0.5rem;
+  font-size:1.15rem;
+  font-weight:600;
+}
+.content h4{
+  color:var(--text-primary);
+  margin:1rem 0 0.5rem;
+  font-size:1rem;
+  font-weight:600;
+}
+.content p{
+  margin:0.75rem 0;
+  color:var(--text-primary);
+}
+.content ul,.content ol{
+  margin:0.75rem 0 0.75rem 1.5rem;
+}
+.content li{
+  margin:0.4rem 0;
+  color:var(--text-primary);
+  position:relative;
+}
+.content ul li::marker{
+  color:var(--accent-blue);
+}
+.content code{
+  background:var(--bg-tertiary);
+  padding:0.2rem 0.5rem;
+  border-radius:var(--radius-sm);
+  font-size:0.85em;
+  color:var(--accent-orange);
+  font-family:'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace;
+  border:1px solid var(--border-default);
+}
+.content pre{
+  background:var(--bg-tertiary);
+  padding:1.25rem;
+  border-radius:var(--radius-md);
+  overflow-x:auto;
+  margin:1rem 0;
+  border:1px solid var(--border-default);
+  box-shadow:var(--shadow-sm);
+}
+.content pre code{
+  background:none;
+  padding:0;
+  color:var(--text-primary);
+  border:none;
+  font-size:0.9em;
+  line-height:1.7;
+}
+.content a{
+  color:var(--accent-blue);
+  text-decoration:none;
+  border-bottom:1px solid transparent;
+  transition:border-color var(--transition-fast);
+}
+.content a:hover{
+  border-bottom-color:var(--accent-blue);
+}
+.content blockquote{
+  border-left:3px solid var(--accent-green-border);
+  padding-left:1rem;
+  margin:1rem 0;
+  color:var(--text-secondary);
+  background:var(--bg-tertiary);
+  padding:1rem;
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+}
+.content table{
+  width:100%;
+  border-collapse:collapse;
+  margin:1rem 0;
+  overflow:hidden;
+  border-radius:var(--radius-sm);
+}
+.content th,.content td{
+  padding:0.75rem 1rem;
+  border:1px solid var(--border-default);
+  text-align:left;
+}
+.content th{
+  background:var(--bg-tertiary);
+  color:var(--accent-blue);
+  font-weight:600;
+}
+.content tr:hover td{
+  background:var(--bg-tertiary);
+}
+.content img{
+  max-width:100%;
+  border-radius:var(--radius-md);
+  margin:1rem 0;
+  box-shadow:var(--shadow-md);
+  transition:transform var(--transition-normal);
+}
+.content img:hover{
+  transform:scale(1.02);
+}
+.content hr{
+  border:none;
+  border-top:1px solid var(--border-default);
+  margin:2rem 0;
+}
+/* Loading State */
+#readme-content:empty::before{
+  content:'';
+  display:block;
+  height:20px;
+  width:20px;
+  border:2px solid var(--border-default);
+  border-top-color:var(--accent-blue);
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+  margin:2rem auto;
+}
+@keyframes spin{
+  to{transform:rotate(360deg);}
+}
+/* Footer */
+footer{
+  margin-top:auto;
+  padding-top:2rem;
+  padding-bottom:1rem;
+  border-top:1px solid var(--border-default);
+  text-align:center;
+  color:var(--text-muted);
+  font-size:0.875rem;
+}
+footer a{
+  color:var(--accent-blue);
+  text-decoration:none;
+  transition:color var(--transition-fast);
+}
+footer a:hover{
+  color:var(--text-primary);
+}
+/* Responsive Design */
+@media(max-width:768px){
+  .container{padding:1.5rem 1rem}
+  h1{font-size:1.75rem}
+  .content{padding:1.5rem}
+  .header-content{gap:0.75rem}
+}
+@media(max-width:480px){
+  .container{padding:1rem 0.75rem}
+  h1{font-size:1.5rem}
+  .description{font-size:1rem}
+  .links{flex-direction:column}
+  .links a{justify-content:center}
+  .content{padding:1rem}
+  .content h2{font-size:1.25rem}
+  .content pre{padding:0.75rem;font-size:0.85em}
+  .content table{font-size:0.875em}
+  .content th,.content td{padding:0.5rem 0.75rem}
+  .badges{justify-content:center}
+}
+/* Print Styles */
+@media print{
+  body{background:#fff;color:#000}
+  .links{display:none}
+  .content{border:none;box-shadow:none}
+  a{text-decoration:underline}
+}
+/* Focus States for Accessibility */
+a:focus,button:focus{
+  outline:2px solid var(--accent-blue);
+  outline-offset:2px;
+  border-radius:var(--radius-sm);
+}
+/* Reduced Motion */
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{
+    animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0.01ms !important;
+  }
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+<div class="container">
+<header>
+<div class="header-content">
+<h1>root</h1>
+<div class="badges">
+<span class="badge">📁 Meta</span>
+<span class="badge fleet">⚡ Turbo Fleet</span>
+</div>
+<p class="description">Workspace orchestration hub with deployment scripts and CI/CD automation</p>
+<div class="links">
+<a href="https://github.com/Turbo-the-tech-dev/root" aria-label="View GitHub Repository">
+<span>GitHub Repo</span>
+</a>
+<a href="https://github.com/Turbo-the-tech-dev" aria-label="View Turbo Fleet Command">
+<span>Turbo Fleet Command</span>
+</a>
+</div>
+</div>
+</header>
+<main>
+<div class="content" id="readme-content" role="article" aria-label="README content">
+<noscript>
+<p>JavaScript is required to view the README content.</p>
+</noscript>
+</div>
+</main>
+<footer>
+<p>Part of <a href="https://github.com/Turbo-the-tech-dev">Turbo Fleet Command</a> · Powered by GitHub Pages</p>
+</footer>
+</div>
+<script>
+(function(){
+  const readme = document.getElementById('readme-content');
+  
+  fetch('README.md')
+    .then(r => r.ok ? r.text() : Promise.reject('No README'))
+    .then(md => {
+      readme.innerHTML = marked.parse(md);
+      // Add fade-in animation to content
+      readme.style.opacity = '0';
+      readme.style.transition = 'opacity 0.4s ease-out';
+      requestAnimationFrame(() => {
+        readme.style.opacity = '1';
+      });
+    })
+    .catch(() => {
+      readme.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:2rem;">Documentation coming soon.</p>';
+    });
+})();
+</script>
+</body>
+</html>

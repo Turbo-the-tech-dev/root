@@ -1,0 +1,79 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: success-rate
+  namespace: turbo-fleet-production
+spec:
+  args:
+    - name: service-name
+  metrics:
+    - name: success-rate
+      interval: 1m
+      successCondition: result[0] >= 0.95
+      failureLimit: 3
+      provider:
+        prometheus:
+          address: http://prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            sum(
+              rate(
+                http_requests_total{
+                  namespace="turbo-fleet-production",
+                  service="{{args.service-name}}",
+                  status_code=~"2.."
+                }[5m]
+              )
+            ) 
+            / 
+            sum(
+              rate(
+                http_requests_total{
+                  namespace="turbo-fleet-production",
+                  service="{{args.service-name}}"
+                }[5m]
+              )
+            )
+    - name: error-rate
+      interval: 1m
+      successCondition: result[0] <= 0.05
+      failureLimit: 3
+      provider:
+        prometheus:
+          address: http://prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            sum(
+              rate(
+                http_requests_total{
+                  namespace="turbo-fleet-production",
+                  service="{{args.service-name}}",
+                  status_code=~"5.."
+                }[5m]
+              )
+            ) 
+            / 
+            sum(
+              rate(
+                http_requests_total{
+                  namespace="turbo-fleet-production",
+                  service="{{args.service-name}}"
+                }[5m]
+              )
+            )
+    - name: latency-p99
+      interval: 1m
+      successCondition: result[0] <= 500
+      failureLimit: 3
+      provider:
+        prometheus:
+          address: http://prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            histogram_quantile(0.99,
+              sum(
+                rate(
+                  http_request_duration_seconds_bucket{
+                    namespace="turbo-fleet-production",
+                    service="{{args.service-name}}"
+                  }[5m]
+                )
+              ) by (le)
+            )

@@ -1,0 +1,131 @@
+# =============================================================================
+# Reusable Build & Deploy Workflow
+# Builds Docker image and deploys to S3/CloudFront
+# =============================================================================
+
+name: Reusable Build & Deploy
+
+on:
+  workflow_call:
+    inputs:
+      workspace:
+        description: 'Path to the workspace to build'
+        required: true
+        type: string
+      environment:
+        description: 'Target environment (staging, production)'
+        required: true
+        type: string
+      build_output_dir:
+        description: 'Directory containing build artifacts'
+        required: false
+        type: string
+        default: 'dist'
+    outputs:
+      image_tag:
+        description: 'Docker image tag that was built'
+        value: ${{ jobs.build.outputs.image_tag }}
+      s3_uri:
+        description: 'S3 URI where artifacts were deployed'
+        value: ${{ jobs.deploy.outputs.s3_uri }}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Generate image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: turbo-fleet/${{ basename(inputs.workspace) }}
+          tags: |
+            type=sha,prefix=${{ inputs.environment }}-
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ inputs.workspace }}
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
+
+      - name: Run container tests
+        run: |
+          docker run --rm ${{ steps.meta.outputs.tags }} npm test || exit 1
+
+      - name: Extract build artifacts
+        run: |
+          CONTAINER_ID=$(docker create ${{ steps.meta.outputs.tags }})
+          docker cp $CONTAINER_ID:/app/${{ inputs.build_output_dir }} ./build-output
+          docker rm $CONTAINER_ID
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ basename(inputs.workspace) }}-${{ inputs.environment }}
+          path: ./build-output/
+          retention-days: 7
+
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    needs: build
+    environment: ${{ inputs.environment }}
+    outputs:
+      s3_uri: ${{ steps.deploy.outputs.s3_uri }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-${{ basename(inputs.workspace) }}-${{ inputs.environment }}
+          path: ./deploy-artifacts
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          role-session-name: github-actions-${{ inputs.environment }}
+          aws-region: us-east-1
+
+      - name: Deploy to S3
+        id: deploy
+        env:
+          BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
+          CLOUDFRONT_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          aws s3 sync ./deploy-artifacts/ s3://$BUCKET_NAME/ \
+            --delete \
+            --cache-control "public,max-age=31536000,immutable"
+          
+          # HTML files should not be cached aggressively
+          aws s3 cp s3://$BUCKET_NAME/index.html s3://$BUCKET_NAME/index.html \
+            --cache-control "public,max-age=0,must-revalidate"
+          
+          echo "s3_uri=s3://$BUCKET_NAME/" >> $GITHUB_OUTPUT
+
+      - name: Invalidate CloudFront cache
+        env:
+          CLOUDFRONT_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id $CLOUDFRONT_ID \
+            --paths "/*"

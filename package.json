@@ -1,0 +1,22 @@
+{
+  "name": "turbo-fleet-root",
+  "version": "1.0.0",
+  "description": "Master Turbo's Fleet Command - Root Workspace",
+  "private": true,
+  "workspaces": [
+    "DEATHSTAR",
+    "Electrician-PROMPT-GENIE",
+    "sectors/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "deploy": "turbo run deploy",
+    "test:root": "turbo run test --filter=//",
+    "install-all": "npm install --workspaces"
+  },
+  "devDependencies": {
+    "turbo": "latest"
+  }
+}
