@@ -1,0 +1,10 @@
+# Kubernetes
+*.yaml
+!k8s/base/*.yaml
+!k8s/overlays/**/*.yaml
+!k8s/external-secrets/*.yaml
+!k8s/analysis-templates/*.yaml
+!monitoring/*.yaml
+
+# Generated manifests
+k8s/overlays/**/kustomization.yaml

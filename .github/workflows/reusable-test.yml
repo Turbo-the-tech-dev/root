@@ -1,0 +1,70 @@
+# =============================================================================
+# Reusable Test Workflow
+# Call this from main CI pipeline for any Node.js workspace
+# =============================================================================
+
+name: Reusable Test
+
+on:
+  workflow_call:
+    inputs:
+      workspace:
+        description: 'Path to the workspace to test'
+        required: true
+        type: string
+      node_version:
+        description: 'Node.js version to use'
+        required: false
+        type: string
+        default: '20'
+      coverage_required:
+        description: 'Whether coverage is required to pass'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  test:
+    name: Test ${{ inputs.workspace }}
+    runs-on: ubuntu-latest
+    container: node:${{ inputs.node_version }}-alpine
+
+    services:
+      # Add services here if workspace needs them (redis, postgres, etc.)
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache node_modules
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ inputs.node_version }}-${{ hashFiles(format('{0}/package-lock.json', inputs.workspace)) }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ inputs.node_version }}-
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        working-directory: ${{ inputs.workspace }}
+        run: npm ci --frozen-lockfile
+
+      - name: Run linter
+        working-directory: ${{ inputs.workspace }}
+        run: npm run lint --if-present
+        continue-on-error: true
+
+      - name: Run tests
+        working-directory: ${{ inputs.workspace }}
+        run: npm test
+        env:
+          CI: true
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ basename(inputs.workspace) }}
+          path: ${{ inputs.workspace }}/coverage/
+          retention-days: 7

@@ -1,0 +1,20 @@
+# Link Checker Configuration
+# Excludes for lychee link checker
+
+# Exclude patterns
+--exclude 'https://github.com/.*'
+--exclude 'https://img.shields.io/.*'
+--exclude 'http://localhost.*'
+--exclude 'https://localhost.*'
+--exclude 'file://.*'
+
+# Exclude directories
+--exclude-path 'node_modules'
+--exclude-path '.git'
+--exclude-path 'logs'
+
+# Settings
+--timeout 30
+--max-retries 3
+--retry-wait-time 5
+--user-agent 'Mozilla/5.0 (compatible; LinkChecker/1.0; +https://github.com/Turbo-the-tech-dev/root)'

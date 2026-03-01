@@ -1,0 +1,93 @@
+# =============================================================================
+# Canary Rollout - Progressive Delivery
+# Uses Argo Rollouts for staged production deployments
+# =============================================================================
+
+name: Canary Rollout 🦋
+
+on:
+  workflow_run:
+    workflows: ["Deploy Electrician ⚡"]
+    types:
+      - completed
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  canary-analysis:
+    name: Canary Analysis
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.29.0'
+
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+
+      - name: Wait for Canary Deployment
+        run: |
+          kubectl wait --for=condition=available rollout/prod-electrician-canary \
+            -n turbo-fleet-production \
+            --timeout=300s
+
+      - name: Run Analysis Template
+        run: |
+          kubectl create job canary-analysis-$(date +%s) \
+            --namespace=turbo-fleet-production \
+            --from=cronjob/canary-analysis \
+            || true
+
+      - name: Monitor Metrics (5 min)
+        id: monitor
+        run: |
+          sleep 300
+          
+          # Query Prometheus for error rate
+          ERROR_RATE=$(curl -s "http://prometheus.monitoring.svc:9090/api/v1/query?query=sum(rate(http_requests_total{namespace='turbo-fleet-production',status_code=~'5..'}[5m]))/sum(rate(http_requests_total{namespace='turbo-fleet-production'}[5m]))" \
+            | jq -r '.data.result[0].value[1]')
+          
+          echo "Error rate: $ERROR_RATE"
+          
+          if (( $(echo "$ERROR_RATE > 0.05" | bc -l) )); then
+            echo "❌ Error rate exceeds threshold (5%)"
+            echo "rollback=true" >> $GITHUB_OUTPUT
+          else
+            echo "✅ Error rate within acceptable limits"
+            echo "rollback=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Promote or Rollback
+        run: |
+          if [[ "${{ steps.monitor.outputs.rollback }}" == "true" ]]; then
+            echo "🚨 Initiating rollback..."
+            kubectl argo rollouts abort prod-electrician-canary -n turbo-fleet-production
+            kubectl argo rollouts undo prod-electrician-canary -n turbo-fleet-production
+          else
+            echo "✅ Promoting to full rollout..."
+            kubectl argo rollouts promote prod-electrician-canary -n turbo-fleet-production
+          fi
+
+      - name: Notify Result
+        uses: slackapi/slack-github-action@v1
+        if: always()
+        with:
+          payload: |
+            {
+              "text": "Canary Rollout ${{ steps.monitor.outputs.rollback == 'true' && 'ROLLED BACK' || 'PROMOTED' }}",
+              "error_rate": "${{ steps.monitor.outputs.error_rate }}",
+              "commit": "${{ github.sha }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

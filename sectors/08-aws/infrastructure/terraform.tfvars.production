@@ -1,0 +1,17 @@
+# Production Terraform Variables - Turbo Fleet Infrastructure
+# DO NOT COMMIT production-specific values to version control
+
+# Environment Configuration
+environment = "production"
+
+# AWS Region
+aws_region = "us-east-1"
+
+# Custom Domain
+domain_name = "fleet.turbo.dev"
+
+# Route53 Hosted Zone ID
+hosted_zone_id = "ZXXXXXXXXXXXXX"
+
+# Destruction Protection - ALWAYS TRUE FOR PRODUCTION
+enable_destruction_protection = true

@@ -1,0 +1,20 @@
+# Terraform Variables Template - Copy to terraform.tfvars and customize
+# DO NOT commit actual values to version control
+
+# Environment Configuration
+environment = "staging"
+
+# AWS Region
+aws_region = "us-east-1"
+
+# Custom Domain (optional - leave empty for CloudFront default domain)
+# Example: "fleet.turbo.dev"
+domain_name = ""
+
+# Route53 Hosted Zone ID (required if using custom domain)
+# Example: "Z1234567890ABC"
+hosted_zone_id = ""
+
+# Destruction Protection (set to false for staging to allow easy cleanup)
+# ALWAYS set to true for production
+enable_destruction_protection = false

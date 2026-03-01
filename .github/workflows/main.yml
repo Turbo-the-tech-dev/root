@@ -1,0 +1,42 @@
+name: Turbo Fleet CI/CD 🚀
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-electrician:
+    name: Test Electrician-PROMPT-GENIE ⚡
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: |
+          cd Electrician-PROMPT-GENIE
+          npm install
+      - name: Run tests
+        run: |
+          cd Electrician-PROMPT-GENIE
+          npm test
+
+  test-deathstar:
+    name: Test DEATHSTAR 💀
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: |
+          cd DEATHSTAR
+          npm install
+      - name: Run tests
+        run: |
+          cd DEATHSTAR
+          npm test
