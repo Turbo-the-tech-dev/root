@@ -1,6 +1,6 @@
 # QWEN.md — Root Workspace Context
 
-**Workspace:** Turbo-the-tech-dev Root Orchestration
+**Workspace:** Turbo-the-tech-dev/root Orchestration
 **Platform:** Termux (Android)
 **Organization:** [@Turbo-the-tech-dev](https://github.com/Turbo-the-tech-dev)
 **Primary Branch:** `27-claude`
@@ -32,45 +32,36 @@ See `MASTER-INDEX.md` for complete catalog of all 25 repositories.
 ## 🗂️ Directory Structure
 
 ```
-/root (orchestration root)
+root/
 ├── MASTER-INDEX.md              # Complete repo catalog
 ├── CLAUDE.md                    # Claude Code guidance
 ├── HOLOCRON.md                  # Master command center (priorities, aliases)
 ├── docker-compose.yml           # Service orchestration
+├── Makefile                     # Build & deployment commands
 ├── push_all_repos.sh            # Deploy all repos to GitHub
 ├── cleanup_local_repos.sh       # Post-deploy cleanup
 │
-├── scripts_workspace/           # Automation suite
-│   ├── utilities/               # Core utility scripts
-│   ├── drive-management/        # Google Drive sync
-│   ├── git-training/            # Git workflows
-│   ├── master-control/          # Repo verification
-│   └── documentation/           # Markdown guides
+├── scripts/                     # Automation suite
+│   ├── imperial-aliases.sh      # Shell aliases
+│   ├── sector-search.sh         # Cross-repo search
+│   └── README.md                # Script documentation
 │
-├── files/                       # File organization (53 extensions)
-│   ├── sh/, py/, js/, ts/       # Source code by extension
-│   ├── md/, html/, css/         # Documentation & web
-│   └── json/, yaml/             # Configuration
-│
-├── shifts/                      # Shift work tracking
-│   ├── 1/, 2/, 3/               # Individual shift workspaces
-│   └── master/                  # Consolidated status
-│
-├── special_drive/               # Organized content
-│   ├── 01_CRITICAL/             # Critical notes & strategy
-│   ├── 02_PROJECTS/             # Project files
-│   ├── 06_ELECTRICAL/           # Electrical engineering
-│   └── 07_ARCHIVE/              # Archived content
+├── DEATHSTAR/                   # Bash CLI tools
+├── Electrician-PROMPT-GENIE/    # React Native electrical tools
+├── Sector-15-Vader-Dev/         # Active development workspace
+├── Sector-18-Turbo-Dev/         # Active development workspace
+├── sectors/                     # Sector-based organization (01-20)
 │
 ├── Electrical-Core-API/         # .NET Core API service
-│   └── src/                     # Domain, Application, Infrastructure
-│
 ├── agents/                      # AI agent configurations
-│   └── theoggrant/              # Neuro-symbolic pipeline
+├── k8s/                         # Kubernetes manifests
+├── monitoring/                  # Monitoring & observability
 │
-├── _best-practices/             # Best practice guides
-├── _ubuntu/, _kali/             # Distro templates
-└── __THE_SANDBOX__/             # Nested testing sandboxes
+├── .github/                     # GitHub Actions, templates, configs
+│   ├── workflows/               # CI/CD pipelines
+│   └── ISSUE_TEMPLATE/          # Bug, feature, task templates
+│
+└── .gitops/                     # GitOps configurations
 ```
 
 ---
@@ -81,38 +72,77 @@ See `MASTER-INDEX.md` for complete catalog of all 25 repositories.
 
 ```bash
 # Push all local repositories to GitHub
-/root/push_all_repos.sh
+./push_all_repos.sh
 
 # Clean up local repository copies (after successful push)
-/root/cleanup_local_repos.sh
+./cleanup_local_repos.sh
 
 # Verify repository status
-bash scripts_workspace/master-control/verify-repos.sh
+cat MASTER-INDEX.md
 ```
 
-### File Organization
+### Makefile Commands
 
 ```bash
-# Organize files by extension (dry-run first)
-bash file_collector.sh --dry-run
-bash file_collector.sh --resume
+make help             # Show all available commands
+make install          # Install workspace dependencies (npm)
+make test             # Run all tests
+make lint             # Run all linters
+make build            # Build all workspaces
+make clean            # Clean build artifacts
+
+# Docker
+make docker-build     # Build Docker images
+make docker-run       # Run containers via docker-compose
+make docker-clean     # Remove containers
+
+# Terraform (Infrastructure)
+make tf-init          # Initialize Terraform
+make tf-plan          # Show Terraform plan
+make tf-apply         # Apply Terraform changes
+make tf-destroy       # Destroy infrastructure
+make tf-validate      # Validate Terraform config
+
+# Kubernetes
+make k8s-apply-staging      # Apply staging config
+make k8s-apply-production   # Apply production config
+make k8s-diff-staging       # Show staging diff
+make k8s-pods               # List pods
+
+# ArgoCD
+make argocd-sync-staging    # Sync staging
+make argocd-sync-production # Sync production
+make argocd-status          # Show app status
 ```
 
-### Git Workflow
+### npm/Turbo Commands
 
 ```bash
-# Standard git workflow with commit message
-bash scripts_workspace/git-training/git-workflow.sh . "feat: message"
+npm run build         # Build all workspaces (Turbo)
+npm run lint          # Lint all workspaces
+npm run test          # Test all workspaces
+npm run deploy        # Deploy all workspaces
+npm install --workspaces  # Install all dependencies
+```
 
-# Clone scripts repository
-bash scripts_workspace/drive-management/clone-scripts-repo.sh
+### Docker Services
+
+```bash
+# Start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
 ```
 
 ### Sub-Project Development
 
 ```bash
 # React Native (Electrician)
-cd Turbo-Repos/Electrician
+cd Electrician-PROMPT-GENIE
 npm install && npm test
 
 # Flutter (sovereign-circuit-academy)
@@ -125,16 +155,10 @@ python3 sovereign-circuit-academy/box_fill_calculator.py
 # .NET Core API
 cd Electrical-Core-API
 dotnet run
-```
 
-### Docker Services
-
-```bash
-# Start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
+# Bash CLI (DEATHSTAR)
+cd DEATHSTAR
+./deathstar.sh --help
 ```
 
 ---
@@ -186,41 +210,87 @@ set -euo pipefail
 - Use type hints
 - Write docstrings for all functions
 
+### TypeScript/JavaScript
+
+- Use ESLint configuration from project
+- Format with Prettier (2-space indent)
+- Prefer `const` over `let`
+- Add JSDoc comments for exported functions
+
 ### Markdown
 
-- Use `#` for headings
+- Use `#` for headings (not underlines)
 - Keep line length under 100 characters
 - Use backticks for code references
 
 ---
 
-## 🎯 Platform Constraints
+## 🔐 Security
 
-**Primary Environment:** Termux (Android)
-- No native build toolchain (Xcode/Android Studio)
-- Node.js/npm projects use Expo for React Native
-- Flutter uses `flutter pub/run` commands
-- Python scripts run directly
-- Bash is the primary CLI tool
+### Reporting Vulnerabilities
+
+- **Email:** security@turbo-the-tech-dev.com
+- **GitHub:** Use private vulnerability reporting (Security tab)
+- **Response Time:** Within 48 hours
+- **Do NOT** open public issues for security vulnerabilities
+
+### Required Secrets (GitHub Actions)
+
+Configure in **Settings → Secrets and variables → Actions**:
+
+| Secret | Description |
+|--------|-------------|
+| `AWS_ROLE_ARN` | IAM role ARN for OIDC authentication |
+| `SLACK_WEBHOOK_URL` | Slack incoming webhook |
+| `KUBECONFIG` | Kubernetes config (base64 encoded) |
+
+See `.github/SECRETS_GUIDE.md` for complete setup instructions.
+
+### Environment Variables
+
+See `.github/ENVIRONMENT_VARIABLES.example` for required variables:
+- `S3_BUCKET_NAME`
+- `CLOUDFRONT_DISTRIBUTION_ID`
+- `DEPLOY_URL`
+
+### Security Best Practices
+
+- Never commit secrets or API keys
+- Use `.env` files for sensitive configuration
+- Review shell scripts before running with elevated privileges
+- All scripts use `set -euo pipefail` for safe execution
+- Automated secret scanning via GitHub Actions
 
 ---
 
-## 📊 Key Files Reference
+## 🤖 Automation & CI/CD
 
-| File | Purpose |
-|------|---------|
-| `MASTER-INDEX.md` | Catalog of all 25 GitHub repositories |
-| `CLAUDE.md` | Project guidance for Claude Code |
-| `HOLOCRON.md` | Daily priorities, navigation aliases, metrics |
-| `CONTRIBUTING.md` | Contribution guidelines |
-| `CODE_OF_CONDUCT.md` | Community standards |
-| `docker-compose.yml` | Service orchestration |
-| `scripts_workspace/README.md` | Script development guide |
-| `files/README.md` | File organization system |
+### GitHub Actions Workflows
+
+| Workflow | Schedule | Purpose |
+|----------|----------|---------|
+| `ci-cd.yml` | On push | Main CI/CD pipeline |
+| `deploy-electrician.yml` | On push | Deploy Electrician app |
+| `eas-build-update.yml` | On push | EAS build updates |
+| `link-checker.yml` | Scheduled | Check broken links |
+| `main.yml` | On push | Main branch workflow |
+| `nightly-audit.yml` | Nightly | Security audit |
+| `terraform-plan.yml` | On push | Terraform planning |
+| `terraform-apply.yml` | On merge | Terraform apply |
+| `sovereign-gatekeeper.yml` | On push | Security gatekeeping |
+
+### Neuro-Symbolic Pipeline
+
+The `agents/theoggrant/` directory contains the neuro-symbolic CI/CD blueprint:
+- **LLM as Creative Engine** for code generation
+- **Z3 SMT Solver** as Logical Auditor for formal verification
+- **Feedback loop** for automated repair
 
 ---
 
-## 🔧 Dark-Key Aliases (from HOLOCRON.md)
+## 🧭 Quick Navigation (Dark-Key Aliases)
+
+Source `scripts/imperial-aliases.sh` for these shortcuts:
 
 ```bash
 h    # The Holocron (HOLOCRON.md)
@@ -233,53 +303,43 @@ m    # Mason's AI Workflow
 eod  # Mason's EOD Report
 ```
 
----
-
-## 🤖 Automation & CI/CD
-
-### GitHub Actions Workflows
-
-Located in `.github/workflows/`:
-
-| Workflow | Schedule | Purpose |
-|----------|----------|---------|
-| `monthly-report.yml` | 1st of month | Fleet-wide status report |
-| `weekly-metrics.yml` | Weekly | Repository metrics tracking |
-| `secret-scan.yml` | On push | Security scanning |
-| `gemini-*.yml` | Various | Gemini AI integrations |
-
-### Neuro-Symbolic Pipeline
-
-The `agents/theoggrant/` directory contains the neuro-symbolic CI/CD blueprint:
-- LLM as Creative Engine for code generation
-- Z3 SMT Solver as Logical Auditor for formal verification
-- Feedback loop for automated repair
-
----
-
-## 📈 Testing Practices
+### Sector Navigation
 
 ```bash
-# Dry-run tests (where available)
-bash script_name.sh --dry-run
-
-# Run project tests
-npm test          # Node.js projects
-pytest            # Python projects
-flutter test      # Flutter projects
-dotnet test       # .NET projects
+s 08    # AWS sector
+s 17    # Flutter sector
+s 19    # Expo sector
+s 06    # Firestore sector
+s 15    # Vader (Security) sector
 ```
-
-**Platform Testing:** Always test on Termux (primary platform) before deployment.
 
 ---
 
-## 🔐 Security
+## 📊 Repository Metrics
 
-- See `SECURITY.md` for vulnerability reporting
-- Automated secret scanning via GitHub Actions
-- Never commit API keys, credentials, or secrets
-- Use `.env` files for sensitive configuration
+| Metric | Value |
+|--------|-------|
+| **Total Repositories** | 25 |
+| **Deployed to GitHub** | 25 ✅ |
+| **Active Development** | sovereign-circuit-academy |
+| **Automation Level** | Optimal |
+| **Platform** | Termux (Android) |
+
+---
+
+## 🔗 Key Files Reference
+
+| File | Purpose |
+|------|---------|
+| `MASTER-INDEX.md` | Catalog of all 25 GitHub repositories |
+| `CLAUDE.md` | Project guidance for Claude Code |
+| `HOLOCRON.md` | Daily priorities, navigation aliases, metrics |
+| `CONTRIBUTING.md` | Contribution guidelines |
+| `CODE_OF_CONDUCT.md` | Community standards |
+| `SECURITY.md` | Security policy and vulnerability reporting |
+| `Makefile` | Build, test, deploy commands |
+| `docker-compose.yml` | Service orchestration |
+| `.github/workflows/` | GitHub Actions CI/CD pipelines |
 
 ---
 
@@ -287,7 +347,7 @@ dotnet test       # .NET projects
 
 - **Issues:** Use GitHub issue templates (`.github/ISSUE_TEMPLATE/`)
 - **Discussions:** https://github.com/Turbo-the-tech-dev/root/discussions
-- **Contact:** turbo-dev@example.com
+- **Security:** security@turbo-the-tech-dev.com
 
 ---
 
