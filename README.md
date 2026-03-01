@@ -1,142 +1,109 @@
-# ⚡ Turbo-the-tech-dev — Root Workspace
+# Turbo-the-tech-dev Root Workspace
 
-> Electrical engineering education, NEC compliance tools, AI/ML resources, and developer utilities.
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![GitHub Profile](https://img.shields.io/badge/GitHub-Turbo--the--tech--dev-blue)](https://github.com/Turbo-the-tech-dev)
-
-Welcome to the central repository for **Electrical Engineering, Field Operations, and NEC Compliance**. This is the orchestration hub for the Turbo Fleet, a collection of specialized tools and documentation.
-
----
-
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Repository Catalog](#repository-catalog)
-- [Core Functionality](#core-functionality)
-- [API & Interface Documentation](#api--interface-documentation)
-- [Development & Testing](#development--testing)
-- [Repository Health](#repository-health)
-- [Quick Links](#quick-links)
+**Organization:** [@Turbo-the-tech-dev](https://github.com/Turbo-the-tech-dev)
+**Last Updated:** 2026-02-23
+**Branch:** `27-claude`
 
 ---
 
 ## Overview
 
-This is the root workspace for [@Turbo-the-tech-dev](https://github.com/Turbo-the-tech-dev), a collection of 25+ repositories spanning:
+Root orchestration repository for 25+ sub-repositories spanning educational materials, AI/ML systems, electrical engineering tools, and utility projects.
 
-- **Electrical Engineering** — NEC compliance, conduit bending, load calculations
-- **AI/ML** — Prompt engineering, LLM fundamentals, generative AI
-- **Education** — Math fundamentals, college bridge resources
-- **Developer Tools** — CLI utilities, Turborepo orchestration
+## 🗂️ Directory Structure
 
-See [MASTER-INDEX.md](MASTER-INDEX.md) for the full repository catalog.
+### `/files/` — File Organization (53 extensions)
+sh, py, js, ts, jsx, tsx, html, css, json, yaml, md, rs, go, java, c, cpp, rb, php, swift, kt, scala, r, lua, hs, and 28+ more
 
----
+Each with README.md, organized files, and timestamped logs.
 
-## 📁 Repository Catalog
+**Tool:** `file_collector.sh` — batch scan → copy → commit → cleanup
 
-### ⚡ Electrical Engineering
-
-| Repository | Description |
-|------------|-------------|
-| [electrical-field](https://github.com/Turbo-the-tech-dev/electrical-field) | 568-directory comprehensive electrical reference |
-| [sovereign-circuit-academy](https://github.com/Turbo-the-tech-dev/sovereign-circuit-academy) | NEC 2026, conduit bending, load auditor tools |
-
-### 🤖 AI / Machine Learning
-
-| Repository | Description |
-|------------|-------------|
-| [prompt-engineering](https://github.com/Turbo-the-tech-dev/prompt-engineering) | Tasks, verbs, context, iterative prompting |
-| [advanced-prompt-engineering](https://github.com/Turbo-the-tech-dev/advanced-prompt-engineering) | 19 techniques including CoT and few-shot |
-| [Electrician-PROMPT-GENIE](Electrician-PROMPT-GENIE/README.md) | AI prompt templates for electrician workflows |
-
-### 🔧 Developer Tools & Special Projects
-
-| Repository | Description |
-|------------|-------------|
-| [DEATHSTAR](DEATHSTAR/) | Bash CLI tool suite & Transcription scoring |
-| [masters-of-reverse-engineering](https://github.com/Turbo-the-tech-dev/masters-of-reverse-engineering) | Binary analysis and malware RE |
-| [julia-programming](https://github.com/Turbo-the-tech-dev/julia-programming) | High-performance scientific computing in Julia |
-
----
-
-## 🚀 Core Functionality
-
-- **Workspace Orchestration:** Management of multiple repositories and deployment workflows via **Turborepo**.
-- **NEC 2026 Compliance:** Reference and tools updated for the latest National Electrical Code.
-- **AI Prompt Engineering:** Specialized prompt templates for diagnostic, auditing, and estimation workflows.
-- **Imperial Automation:** Automated linguistic telemetry and capacity monitoring across Sectors 02, 05, 06, 07, 08, and 18.
-
----
-
-## 🛠️ API & Interface Documentation
-
-### Popular Prompt Templates (PROMPT-GENIE)
-- **NEC Compliance Auditor**: Analyzes circuit plans against NFPA 70 requirements.
-- **Fault Finder / Troubleshooter**: Safety-first diagnostic sequence for electrical faults.
-- **Load Calculator Pro**: Calculates total demand load using Article 220 methods.
-
-### Cognitive Frameworks
-- **Safety-First Protocol**: Prioritizes OSHA and LOTO procedures.
-- **Schematic Reasoning**: Traces electrical paths Source -> Load.
-- **Journeyman Mentor**: Practical, veteran-style explanations.
-
----
-
-## 🧪 Development & Testing
-
-This workspace uses **npm workspaces** and **Turborepo** for optimized execution.
-
-```bash
-npm install     # Install all dependencies across workspaces
-npm run build   # Build all sectors
-npm run test    # Run all unit tests
-npm run lint    # Run static analysis
+### `/scripts_workspace/` — Automation Suite
+```
+utilities/       (4 core scripts)
+drive-management/  (clone & sync)
+git-training/    (git workflows)
+master-control/  (repo verification)
+documentation/   (11 markdown guides)
+2026-02-23-work/ (session output)
 ```
 
-### Imperial Monitoring
-- **Capacity Meter**: `sectors/05-github/issue-2-patch.sh`
-- **Word of the Day**: `sectors/02-gemini/issue-3-extractor.py`
+### `/shifts/` — Shift Work Tracking
+```
+1/, 2/, 3/       (shift workspaces)
+master/          (consolidated master)
+SHIFT_STATUS.md  (live status, symlinked to all shifts)
+GITHUB_CONSISTENCY_PLAN.md
+```
+
+### `/gemini/` — Gemini AI Workspace
+```
+README.md
+TEAM_TODOS_10_HEADLESS_GEMINI.md
+```
+
+### `/__THE_SANDBOX__/` — Nested Testing
+```
+SANDBOX_01 to SANDBOX_05
+Each with nested _01 to _03 sub-sandboxes
+For isolated experimentation
+```
+
+### `SHIFT_2_SANDBOX/`, `SHIFT_3_SANDBOX/`
+Multi-worker shift-based testing with blocked/completed/deliverables/work dirs
 
 ---
 
-## 🔗 Internal Links
+## 📦 Main Projects (25+)
+
+See **MASTER-INDEX.md** for complete catalog.
+
+**Key:**
+- Electrician — React Native + Expo calculator
+- sovereign-circuit-academy — Flutter app (NEC codes, conduit bending)
+- DEATHSTAR — Bash CLI tools
+- Todolite — Vanilla JS to-do app
+
+---
+
+## 🚀 Quick Commands
+
+```bash
+# Check repos
+bash scripts_workspace/master-control/verify-repos.sh
+
+# Organize files
+bash file_collector.sh --dry-run
+bash file_collector.sh --resume
+
+# Git workflow
+bash scripts_workspace/git-training/git-workflow.sh . "feat: message"
+
+# Clone scripts repo
+bash scripts_workspace/drive-management/clone-scripts-repo.sh
+```
+
+---
+
+## 📋 Critical Files
 
 | File | Purpose |
 |------|---------|
-| [Master Index](MASTER-INDEX.md) | Full repository catalog |
-| [Claude Workflow](CLAUDE.md) | AI-assisted development workflow |
-| [Contributing](CONTRIBUTING.md) | How to contribute |
-| [License](LICENSE) | MIT License |
-| [Banner](BANNER.md) | ASCII art and branding |
-| [Root Docs](root.md) | Additional root documentation |
-
-## 📊 Repository Health
-
-| Metric | Status |
-|--------|--------|
-| License | ✅ MIT |
-| CI/CD | ✅ GitHub Actions (5 workflows) |
-| Infrastructure | ✅ Terraform + Kubernetes + ArgoCD |
-| Monitoring | ✅ Prometheus + Grafana + Alertmanager |
-| Last Audit | 2026-02-28 |
-
-See [monthly-audit-response.md](monthly-audit-response.md) for detailed audit findings.
+| CLAUDE.md | Project guidance |
+| MASTER-INDEX.md | All 25 repos |
+| file_collector.sh | Batch organizer |
+| index.html | Web dashboard |
+| .claude/plans/ | Implementation plans |
 
 ---
 
-## 🆘 Quick Links
+## 🎯 Platform
 
-| Purpose | Link |
-|---------|------|
-| New here? | Start with [CONTRIBUTING.md](CONTRIBUTING.md) |
-| Deploying? | See [IMPERIAL_PUSH.md](IMPERIAL_PUSH.md) |
-| DevOps? | Check [DEVOPS.md](DEVOPS.md) |
-| GitOps? | Read [GITOPS_QUICKSTART.md](GITOPS_QUICKSTART.md) |
-| Full catalog | [MASTER-INDEX.md](MASTER-INDEX.md) |
+- **Environment:** Termux (Android)
+- **Organization:** [@Turbo-the-tech-dev](https://github.com/Turbo-the-tech-dev)
+- **Conventions:** `feat:` `fix:` `docs:` `refactor:`
 
 ---
 
-*Maintained by Master Turbo & C-3PO | Repository Status: 151% OPERATIONAL*
-*Last infrastructure update: 2026-02-28 — Marcus Hale approved*
+**Status:** Active | **Contributors:** [@Turbo-the-tech-dev](https://github.com/Turbo-the-tech-dev)

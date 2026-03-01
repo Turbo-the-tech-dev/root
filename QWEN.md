@@ -1,437 +1,294 @@
-# Turbo Fleet Root — Project Context
+# QWEN.md — Root Workspace Context
 
-> **Imperial Fleet Command Center** — Electrical engineering education, NEC compliance tools, AI/ML resources, and DevOps infrastructure.
-
----
-
-## 🏛️ Project Overview
-
-**Turbo Fleet Root** is a monorepo workspace serving as the orchestration hub for 25+ repositories spanning electrical engineering, AI/ML, and developer tools. This is the central command center for the Turbo-the-tech-dev organization.
-
-### Primary Functions
-
-1. **Workspace Orchestration** — Turborepo-managed monorepo with npm workspaces
-2. **NEC 2026 Compliance** — Electrical engineering education and compliance tools
-3. **AI Prompt Engineering** — Specialized templates for electrician workflows
-4. **DevOps Infrastructure** — Full CI/CD, Kubernetes, GitOps, and cloud deployment
-
-### Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    GitHub Actions CI/CD                         │
-│  Terraform → Build → Test → Deploy → Canary → Production        │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      AWS Cloud                                  │
-│  S3 (Static) ← CloudFront (CDN) ← ACM (SSL) ← Route53 (DNS)    │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    Kubernetes (EKS)                             │
-│  ArgoCD (GitOps) + Prometheus/Grafana (Monitoring)              │
-└─────────────────────────────────────────────────────────────────┘
-```
+**Workspace:** Turbo-the-tech-dev Root Orchestration
+**Platform:** Termux (Android)
+**Organization:** [@Turbo-the-tech-dev](https://github.com/Turbo-the-tech-dev)
+**Primary Branch:** `27-claude`
 
 ---
 
-## 📁 Directory Structure
+## 📋 Project Overview
+
+This is the **root workspace repository** that orchestrates 25+ sub-repositories spanning:
+- Educational materials and AI/ML systems
+- Electrical engineering tools (NEC compliance, conduit bending)
+- Automation scripts and CLI utilities
+- Full-stack development projects
+
+### Key Projects
+
+| Project | Technology | Purpose |
+|---------|------------|---------|
+| **Electrician** | React Native + Expo | Electrical calculator app |
+| **sovereign-circuit-academy** | Flutter + Riverpod | NEC codes, conduit bending, load calculators |
+| **DEATHSTAR** | Bash CLI | Automation tool suite |
+| **Electrical-Core-API** | .NET Core | Electrical calculations API |
+| **Todolite** | Vanilla JS | Minimalist to-do app |
+
+See `MASTER-INDEX.md` for complete catalog of all 25 repositories.
+
+---
+
+## 🗂️ Directory Structure
 
 ```
-root/
-├── .github/
-│   └── workflows/           # 11 GitHub Actions workflows
-│       ├── ci-cd.yml        # Main CI/CD pipeline
-│       ├── terraform-*.yml  # Infrastructure plan/apply
-│       ├── deploy-electrician.yml  # Flutter web deployment
-│       ├── eas-build-update.yml    # Expo/EAS OTA updates
-│       ├── canary-rollout.yml      # Progressive delivery
-│       ├── nightly-audit.yml       # Drift detection, security
-│       └── link-checker.yml        # Monthly broken link audit
+/root (orchestration root)
+├── MASTER-INDEX.md              # Complete repo catalog
+├── CLAUDE.md                    # Claude Code guidance
+├── HOLOCRON.md                  # Master command center (priorities, aliases)
+├── docker-compose.yml           # Service orchestration
+├── push_all_repos.sh            # Deploy all repos to GitHub
+├── cleanup_local_repos.sh       # Post-deploy cleanup
 │
-├── .gitops/                 # ArgoCD configurations
-│   ├── applications/        # Staging/Production apps
-│   └── app-of-apps/         # ApplicationSet pattern
+├── scripts_workspace/           # Automation suite
+│   ├── utilities/               # Core utility scripts
+│   ├── drive-management/        # Google Drive sync
+│   ├── git-training/            # Git workflows
+│   ├── master-control/          # Repo verification
+│   └── documentation/           # Markdown guides
 │
-├── sectors/                 # Imperial Sector deployments
-│   ├── 02-gemini/          # Linguistic telemetry
-│   ├── 05-github/          # GraphQL bridge, PR telemetry
-│   ├── 06-firestore/       # Firebase/Firestore integration
-│   ├── 07-termux/          # Termux CLI utilities
-│   ├── 08-aws/             # AWS Infrastructure (Terraform)
-│   │   └── infrastructure/  # S3, CloudFront, IAM, ACM
-│   ├── 17-flutter/         # Flutter interview prep app
-│   ├── 18-turbo-dev/       # Turbo development
-│   ├── 19-expo/            # React Native + EAS Build
-│   └── 20-mainframe-migration/  # Legacy migration strategy
+├── files/                       # File organization (53 extensions)
+│   ├── sh/, py/, js/, ts/       # Source code by extension
+│   ├── md/, html/, css/         # Documentation & web
+│   └── json/, yaml/             # Configuration
 │
-├── DEATHSTAR/              # Bash CLI tool suite, scoring
-├── Electrician-PROMPT-GENIE/  # AI prompt templates
-├── k8s/                    # Kubernetes manifests
-│   ├── base/               # Base Kustomize configs
-│   ├── overlays/           # Staging/Production overlays
-│   └── external-secrets/   # AWS Secrets Manager integration
+├── shifts/                      # Shift work tracking
+│   ├── 1/, 2/, 3/               # Individual shift workspaces
+│   └── master/                  # Consolidated status
 │
-├── monitoring/             # Prometheus/Grafana stack
-└── [Documentation Files]
+├── special_drive/               # Organized content
+│   ├── 01_CRITICAL/             # Critical notes & strategy
+│   ├── 02_PROJECTS/             # Project files
+│   ├── 06_ELECTRICAL/           # Electrical engineering
+│   └── 07_ARCHIVE/              # Archived content
+│
+├── Electrical-Core-API/         # .NET Core API service
+│   └── src/                     # Domain, Application, Infrastructure
+│
+├── agents/                      # AI agent configurations
+│   └── theoggrant/              # Neuro-symbolic pipeline
+│
+├── _best-practices/             # Best practice guides
+├── _ubuntu/, _kali/             # Distro templates
+└── __THE_SANDBOX__/             # Nested testing sandboxes
 ```
 
 ---
 
-## 🛠️ Technology Stack
+## 🚀 Building and Running
 
-### Core Technologies
-
-| Category | Technology | Purpose |
-|----------|------------|---------|
-| **Monorepo** | Turborepo + npm workspaces | Workspace orchestration |
-| **CI/CD** | GitHub Actions | Automated pipelines |
-| **Infrastructure** | Terraform | AWS IaC (S3, CloudFront, IAM, ACM) |
-| **Containers** | Docker + Compose | Multi-stage builds |
-| **Orchestration** | Kubernetes + Kustomize | EKS deployment |
-| **GitOps** | ArgoCD | Declarative deployments |
-| **Monitoring** | Prometheus + Grafana + Alertmanager | Observability stack |
-| **Frontend** | Flutter Web | Interview prep application |
-| **Mobile** | Expo (React Native) | Field ops mobile app |
-| **Backend** | Node.js + TypeScript | CLI utilities, scoring |
-
-### Sector-Specific Stack
-
-| Sector | Technology | Function |
-|--------|------------|----------|
-| **08-AWS** | Terraform, AWS SDK | Cloud infrastructure |
-| **17-Flutter** | Flutter, Riverpod, GoRouter | Interview prep app |
-| **19-Expo** | React Native, EAS Build | Mobile app + OTA updates |
-| **20-Mainframe** | Migration strategy docs | Legacy modernization |
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Node.js 20+
-- npm 10+
-- Turborepo (`npm install -g turbo`)
-- Docker (optional, for local testing)
-- Terraform 1.7+ (for infrastructure)
-- kubectl + ArgoCD CLI (for Kubernetes)
-
-### Installation
+### Deploy and Manage Repositories
 
 ```bash
-# Install all workspace dependencies
-npm install
+# Push all local repositories to GitHub
+/root/push_all_repos.sh
 
-# Or use the Makefile
-make install
+# Clean up local repository copies (after successful push)
+/root/cleanup_local_repos.sh
+
+# Verify repository status
+bash scripts_workspace/master-control/verify-repos.sh
 ```
 
-### Development Commands
+### File Organization
 
 ```bash
-# Build all workspaces
-npm run build
-make build
-
-# Run tests
-npm run test
-make test
-
-# Run linters
-npm run lint
-make lint
-
-# Clean build artifacts
-make clean
+# Organize files by extension (dry-run first)
+bash file_collector.sh --dry-run
+bash file_collector.sh --resume
 ```
 
-### Docker Operations
+### Git Workflow
 
 ```bash
-# Build Docker images for all workspaces
-make docker-build
+# Standard git workflow with commit message
+bash scripts_workspace/git-training/git-workflow.sh . "feat: message"
 
-# Run containers locally
-make docker-run
+# Clone scripts repository
+bash scripts_workspace/drive-management/clone-scripts-repo.sh
+```
 
-# Remove all containers
-make docker-clean
+### Sub-Project Development
+
+```bash
+# React Native (Electrician)
+cd Turbo-Repos/Electrician
+npm install && npm test
+
+# Flutter (sovereign-circuit-academy)
+cd sovereign-circuit-academy/vader-academy-app
+flutter pub get && flutter run
+
+# Python tools
+python3 sovereign-circuit-academy/box_fill_calculator.py
+
+# .NET Core API
+cd Electrical-Core-API
+dotnet run
+```
+
+### Docker Services
+
+```bash
+# Start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
 ```
 
 ---
 
-## 🏗️ Infrastructure Operations
+## 📝 Development Conventions
 
-### Terraform Commands
+### Commit Messages (Conventional Commits)
 
-```bash
-# Initialize Terraform
-make tf-init
+```
+type(scope): brief message
 
-# Preview changes
-make tf-plan
-
-# Apply changes
-make tf-apply
-
-# Validate configuration
-make tf-validate
-
-# Destroy infrastructure (DANGEROUS)
-make tf-destroy ENV=staging
+Longer explanation if needed.
 ```
 
-### Kubernetes Commands
+**Types:** `feat:`, `fix:`, `docs:`, `refactor:`, `chore:`, `test:`
 
-```bash
-# Show diff for staging
-make k8s-diff-staging
-
-# Apply staging configuration
-make k8s-apply-staging
-
-# List pods
-make k8s-pods
-
-# Tail logs
-make k8s-logs
+**Examples:**
+```
+feat(file-collector): add batch processing for large file sets
+fix(symlink): correct termux home path resolution
+docs(readme): update quick start section
 ```
 
-### ArgoCD Operations
+### Branch Naming
+
+```
+feature/short-description
+fix/short-description
+docs/short-description
+refactor/short-description
+chore/short-description
+```
+
+### Bash Scripts
 
 ```bash
-# Sync staging application
-make argocd-sync-staging
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Sync production application
-make argocd-sync-production
-
-# Check application status
-make argocd-status
-
-# Wait for health
-make argocd-health
+# Use 2-space indentation
+# Quote all variables: "${var}"
+# Use readonly for constants
+# Add header comments explaining purpose
 ```
+
+### Python
+
+- Follow PEP 8
+- Use type hints
+- Write docstrings for all functions
+
+### Markdown
+
+- Use `#` for headings
+- Keep line length under 100 characters
+- Use backticks for code references
 
 ---
 
-## 📦 CI/CD Pipelines
+## 🎯 Platform Constraints
 
-### Workflow Overview
-
-| Workflow | Trigger | Purpose |
-|----------|---------|---------|
-| `ci-cd.yml` | Push/PR to main | Main pipeline: test, scan, build, deploy |
-| `terraform-plan.yml` | PR to main | Preview infrastructure changes |
-| `terraform-apply.yml` | Merge to main | Deploy infrastructure |
-| `deploy-electrician.yml` | Push/Manual | Build & deploy Flutter web app |
-| `eas-build-update.yml` | Push/Manual | Expo build + OTA updates |
-| `canary-rollout.yml` | After deploy | Progressive delivery with analysis |
-| `nightly-audit.yml` | 2 AM UTC daily | Drift detection, security scan |
-| `link-checker.yml` | Monthly | Broken link detection |
-
-### Environment Promotion
-
-```
-PR Opened → Tests + Security Scan → Merge to main
-    ↓
-Deploy to Staging (auto) → Canary Analysis → Production (manual approval)
-```
+**Primary Environment:** Termux (Android)
+- No native build toolchain (Xcode/Android Studio)
+- Node.js/npm projects use Expo for React Native
+- Flutter uses `flutter pub/run` commands
+- Python scripts run directly
+- Bash is the primary CLI tool
 
 ---
 
-## 📊 Workspaces
-
-### DEATHSTAR
-
-Bash CLI tool suite and transcription scoring utility.
-
-```bash
-cd DEATHSTAR
-npm install
-npm test
-```
-
-**Tech:** TypeScript, tsx, Node.js
-
-### Electrician-PROMPT-GENIE
-
-AI prompt templates for electrician workflows (NEC compliance, troubleshooting, load calculations).
-
-```bash
-cd Electrician-PROMPT-GENIE
-npm install
-npm test
-```
-
-**Tech:** React, TypeScript, tsx
-
-### Sector 17 (Flutter)
-
-NEC 2026 interview preparation application with Riverpod state management and GoRouter navigation.
-
-```bash
-cd sectors/17-flutter
-flutter pub get
-flutter test
-flutter build web --release
-```
-
-**Tech:** Flutter, Riverpod, GoRouter, Equatable
-
-### Sector 19 (Expo)
-
-React Native field operations app with EAS Build and OTA updates.
-
-```bash
-cd sectors/19-expo
-npm install
-npx expo start
-eas build --profile preview
-eas update --branch production
-```
-
-**Tech:** React Native, Expo, EAS Build
-
----
-
-## 🔐 Security & Secrets
-
-### GitHub Secrets Required
-
-| Secret | Scope | Purpose |
-|--------|-------|---------|
-| `AWS_ROLE_ARN` | Repository | OIDC authentication to AWS |
-| `SLACK_WEBHOOK_URL` | Repository | Deployment notifications |
-| `S3_BUCKET_NAME` | Environment (staging/prod) | Deployment target |
-| `CLOUDFRONT_DISTRIBUTION_ID` | Environment | Cache invalidation |
-| `EXPO_TOKEN` | Repository | EAS Build authentication |
-| `KUBECONFIG` | Repository | Kubernetes cluster access |
-
-### OIDC Trust Policy
-
-GitHub Actions authenticates to AWS via OIDC (no long-lived credentials):
-
-```json
-{
-  "Principal": {
-    "Federated": "arn:aws:iam::ACCOUNT_ID:oidc-provider/token.actions.githubusercontent.com"
-  },
-  "Condition": {
-    "StringLike": {
-      "token.actions.githubusercontent.com:sub": "repo:Turbo-the-tech-dev/root:*"
-    }
-  }
-}
-```
-
----
-
-## 🧪 Development Conventions
-
-### Code Style
-
-- **TypeScript:** Strict mode enabled
-- **Formatting:** Consistent indentation, trailing commas
-- **Naming:** camelCase for variables/functions, PascalCase for types/classes
-
-### Testing Practices
-
-- Unit tests co-located with source files (`*.test.ts`)
-- Test runner: `tsx --test`
-- Coverage uploaded to GitHub Actions artifacts
-
-### Commit Messages
-
-Conventional Commits format:
-
-```
-feat(scope): description of new feature
-fix(scope): bug fix description
-docs(scope): documentation changes
-refactor(scope): code refactoring
-test(scope): test additions/updates
-chore(scope): maintenance tasks
-```
-
----
-
-## 📚 Documentation Files
+## 📊 Key Files Reference
 
 | File | Purpose |
 |------|---------|
-| `README.md` | Project overview and quick links |
-| `DEVOPS.md` | DevOps runbook and troubleshooting |
-| `DEPLOYMENT_CHECKLIST.md` | Marcus Hale's deployment checklist |
-| `GITOPS_QUICKSTART.md` | ArgoCD setup guide |
-| `IMPERIAL_PUSH.md` | 8-hour sprint runbook |
-| `MASTER-INDEX.md` | Full repository catalog (25 repos) |
-| `SECRETS_GUIDE.md` | GitHub Secrets configuration |
-| `monthly-audit-response.md` | C-3PO audit findings and responses |
+| `MASTER-INDEX.md` | Catalog of all 25 GitHub repositories |
+| `CLAUDE.md` | Project guidance for Claude Code |
+| `HOLOCRON.md` | Daily priorities, navigation aliases, metrics |
+| `CONTRIBUTING.md` | Contribution guidelines |
+| `CODE_OF_CONDUCT.md` | Community standards |
+| `docker-compose.yml` | Service orchestration |
+| `scripts_workspace/README.md` | Script development guide |
+| `files/README.md` | File organization system |
 
 ---
 
-## 🆘 Troubleshooting
+## 🔧 Dark-Key Aliases (from HOLOCRON.md)
 
-### Common Issues
-
-**Terraform init fails:**
 ```bash
-rm -rf sectors/08-aws/infrastructure/.terraform
-make tf-init
-```
-
-**Docker build fails:**
-```bash
-make clean
-docker builder prune -f
-make docker-build
-```
-
-**GitHub Actions OIDC fails:**
-1. Verify IAM role trust policy allows `token.actions.githubusercontent.com`
-2. Check `aud` claim matches `sts.amazonaws.com`
-3. Verify `sub` claim pattern matches your repo
-
-**Flutter build fails:**
-```bash
-cd sectors/17-flutter
-flutter clean
-flutter pub get
-flutter build web --release
+h    # The Holocron (HOLOCRON.md)
+t    # Today's Conquests (active priorities)
+s    # System Status
+e    # Electrical Portal
+v    # The Vault (Imperial Directives)
+vp   # VP Strategy
+m    # Mason's AI Workflow
+eod  # Mason's EOD Report
 ```
 
 ---
 
-## 📞 Key Personnel
+## 🤖 Automation & CI/CD
 
-| Role | Name | Approval Status |
-|------|------|-----------------|
-| Senior DevOps | Marcus Hale | ☕ Caffeinated |
-| Mainframe Migration | Ray Cole | ✅ Approved |
-| Master Turbo | Turbo-the-tech-dev | 👑 Sovereign |
-| Audit Droid | C-3PO | 🤖 151% OPERATIONAL |
+### GitHub Actions Workflows
 
----
+Located in `.github/workflows/`:
 
-## 🎯 Current Sprint Status
+| Workflow | Schedule | Purpose |
+|----------|----------|---------|
+| `monthly-report.yml` | 1st of month | Fleet-wide status report |
+| `weekly-metrics.yml` | Weekly | Repository metrics tracking |
+| `secret-scan.yml` | On push | Security scanning |
+| `gemini-*.yml` | Various | Gemini AI integrations |
 
-**Imperial 8-Hour Sprint** — In Progress
+### Neuro-Symbolic Pipeline
 
-| Milestone | Status | Notes |
-|-----------|--------|-------|
-| DevOps Infrastructure | ✅ Complete | 56 files, Terraform + K8s + ArgoCD |
-| Flutter Scaffold | ✅ Complete | 15 files, Riverpod + GoRouter |
-| Expo/EAS Pipeline | ✅ Complete | 6 files, OTA updates automated |
-| Mainframe Migration | ✅ Phase 0 Ready | Discovery checklist delivered |
-| refactored-sniffle Port | ⏳ Pending | Awaiting 20 quiz files |
+The `agents/theoggrant/` directory contains the neuro-symbolic CI/CD blueprint:
+- LLM as Creative Engine for code generation
+- Z3 SMT Solver as Logical Auditor for formal verification
+- Feedback loop for automated repair
 
 ---
 
-*Last Updated: 2026-02-28*
-*Repository Status: 151% OPERATIONAL*
-*Marcus Hale approved — Infrastructure as Code complete.*
+## 📈 Testing Practices
+
+```bash
+# Dry-run tests (where available)
+bash script_name.sh --dry-run
+
+# Run project tests
+npm test          # Node.js projects
+pytest            # Python projects
+flutter test      # Flutter projects
+dotnet test       # .NET projects
+```
+
+**Platform Testing:** Always test on Termux (primary platform) before deployment.
+
+---
+
+## 🔐 Security
+
+- See `SECURITY.md` for vulnerability reporting
+- Automated secret scanning via GitHub Actions
+- Never commit API keys, credentials, or secrets
+- Use `.env` files for sensitive configuration
+
+---
+
+## 📞 Support
+
+- **Issues:** Use GitHub issue templates (`.github/ISSUE_TEMPLATE/`)
+- **Discussions:** https://github.com/Turbo-the-tech-dev/root/discussions
+- **Contact:** turbo-dev@example.com
+
+---
+
+**Status:** Active | **Last Updated:** 2026-02-28

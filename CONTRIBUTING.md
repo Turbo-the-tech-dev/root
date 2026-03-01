@@ -1,102 +1,152 @@
-# Contributing to Turbo-the-tech-dev Repositories 🚀
+# Contributing to Turbo Fleet
 
-Thank you for your interest in contributing! This document outlines guidelines for contributing to any repository in the [@Turbo-the-tech-dev](https://github.com/Turbo-the-tech-dev) organization.
+Thank you for your interest in contributing! This document provides guidelines and instructions for participating in the Turbo-the-tech-dev project ecosystem.
 
----
+## Getting Started
 
-## 📜 Workspace Contract (Blue Hat Standard)
+1. **Fork the repository** on GitHub
+2. **Clone your fork** to your local machine
+3. **Create a feature branch** from `main` or `master`
+4. **Make your changes**, following the guidelines below
+5. **Push to your fork** and submit a **Pull Request**
 
-To ensure the root orchestration hub functions correctly, every sub-package in the `workspaces/` directory MUST implement the following scripts in its `package.json`:
+## Branch Naming
 
-1.  **`test`**: Must run the package's unit tests. If no tests exist yet, it should be a no-op (e.g., `"test": "echo 'No tests yet'"`).
-2.  **`build`**: Must produce a build artifact if applicable. If the package does not require building (e.g., pure JS/TS library without transpilation), it should be a no-op.
-3.  **`lint`**: Must run a static analysis tool (e.g., `eslint` or `prettier`).
+Use conventional prefixes for branches:
 
-### Root-Level Commands
-Always run commands from the project root using `turbo` for optimized, cached execution:
-```bash
-npm run build   # Builds all packages in topological order
-npm run test    # Runs all tests in parallel (if independent)
-npm run lint    # Runs all linters
+```
+feature/short-description           (new features)
+fix/short-description              (bug fixes)
+docs/short-description             (documentation)
+refactor/short-description         (code improvements)
+chore/short-description            (maintenance)
 ```
 
----
+**Example:** `feature/add-nec-calculator` or `fix/symlink-status-update`
 
-## Table of Contents
+## Commit Messages
 
-- [Code of Conduct](#code-of-conduct)
-- [How to Contribute](#how-to-contribute)
-- [Commit Convention](#commit-convention)
-- [Pull Request Process](#pull-request-process)
-- [Repository-Specific Guidelines](#repository-specific-guidelines)
-- [License](#license)
+Follow **Conventional Commits** format:
 
----
+```
+type(scope): brief message
 
-## Code of Conduct
+Longer explanation if needed.
+```
 
-- Be respectful and constructive in all interactions.
-- Focus on technical accuracy, especially for NEC references and electrical standards.
-- Credit sources when adding external resources or references.
+**Supported Types:**
+- `feat:` — A new feature
+- `fix:` — A bug fix
+- `docs:` — Documentation changes
+- `refactor:` — Code refactoring (no feature/bug changes)
+- `chore:` — Build, CI, dependency updates
+- `test:` — Test additions or fixes
 
----
+**Example:**
+```
+feat(file-collector): add batch processing for large file sets
 
-## How to Contribute
+Implement BATCH_SIZE=50 with checkpoint resumability.
+Allows killing and resuming without data loss.
+```
 
-1. **Fork** the repository you want to contribute to.
-2. **Clone** your fork locally.
-3. **Create a branch** with a descriptive name:
-   ```bash
-   git checkout -b feat/your-feature-name
-   ```
-4. **Make your changes**, following the guidelines below.
-5. **Commit** with a conventional commit message (see below).
-6. **Push** your branch to your fork.
-7. **Open a Pull Request** against the `master` branch.
+## Code Style
 
----
+### Bash Scripts
+- Use `set -euo pipefail` at the start
+- Indent with 2 spaces (not tabs)
+- Name functions with `snake_case`
+- Add comments for non-obvious logic
+- Use `readonly` for constants
+- Quote all variable expansions: `"${var}"`
 
-## Commit Convention
+### Python
+- Follow [PEP 8](https://www.python.org/dev/peps/pep-0008/)
+- Use type hints where practical
+- Write docstrings for all functions
 
-This organization uses [Conventional Commits](https://www.conventionalcommits.org/):
+### TypeScript/JavaScript
+- Use ESLint configuration from the project
+- Format with Prettier (2-space indent)
+- Prefer `const` over `let`
+- Add JSDoc comments for exported functions
 
-| Prefix | Use Case |
-|--------|----------|
-| `feat:` | New feature or content |
-| `fix:` | Bug fix or correction |
-| `docs:` | Documentation changes |
-| `chore:` | Maintenance, tooling, config |
-| `refactor:` | Code restructuring without behavior change |
-| `test:` | Adding or updating tests |
-
----
+### Markdown
+- Use `#` for headings (not underlines)
+- Keep line length under 100 characters
+- Use backticks for code references
+- Provide examples where helpful
 
 ## Pull Request Process
 
-1. Ensure your branch is up to date with `master` before opening a PR.
-2. Provide a clear description of what changed and why.
-3. For NEC or electrical content, cite the specific article and edition (e.g., *NEC 2023 Article 220.42*).
-4. For external links, verify they return HTTP 200 before including them.
-5. PRs require at least one review before merging.
+1. **Title**: Use conventional commit format in PR title
+2. **Description**: Explain *why* this change, not just *what*
+3. **Link issues**: Reference related issues (e.g., "Closes #26")
+4. **Tests**: Include tests for new features or bug fixes
+5. **Docs**: Update relevant documentation
+6. **Review**: Be responsive to feedback
 
----
+**Example PR description:**
+```markdown
+## Description
+Adds batch processing to file_collector.sh to handle large file sets safely.
 
-## Repository-Specific Guidelines
+## Why
+Prevents system disruption when collecting thousands of files across /root.
 
-### Electrician-PROMPT-GENIE
+## Changes
+- Implement BATCH_SIZE=50
+- Add checkpoint resumability with `--resume` flag
+- Create BATCH_LOG for progress tracking
 
-- Utility functions in `src/utils/` must be **pure** — no React imports.
-- Run `npm test` before submitting.
+Closes #15
+```
 
-### Sub-projects
-- Each sub-project has its own directory and its own git repository (when managed by Turbo Fleet).
-- Always `cd` into the project directory before running project-specific commands.
+## Testing
 
----
+Before submitting a PR:
+
+- **Dry-run tests**: Use `--dry-run` flags where available
+- **Manual testing**: Test your changes on Termux (primary platform)
+- **Existing tests**: Run `npm test` or equivalent
+- **Edge cases**: Consider empty files, symlinks, special characters
+
+## Documentation
+
+Update docs if your PR affects:
+
+- User-visible behavior
+- Installation or setup steps
+- New commands or options
+- Architecture or design decisions
+
+## Code Review
+
+Reviewers will look for:
+
+- ✅ Code quality and readability
+- ✅ Adherence to commit conventions
+- ✅ Test coverage
+- ✅ Documentation completeness
+- ✅ No breaking changes (unless intentional and discussed)
+
+**Respond to feedback** — Questions are not criticism, they're collaborative.
+
+## Community & Help
+
+- **Questions?** Open a [Discussion](https://github.com/Turbo-the-tech-dev/root/discussions) or issue
+- **Found a bug?** Use the [Bug Report template](/.github/ISSUE_TEMPLATE/bug_report.yml)
+- **Have an idea?** Use the [Feature Request template](/.github/ISSUE_TEMPLATE/feature_request.yml)
+- **Security issue?** See [SECURITY.md](./SECURITY.md)
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the same [MIT License](LICENSE) that covers this project.
+By contributing, you agree that your contributions will be licensed under the project's license (see LICENSE file).
 
 ---
-*Maintained by Master Turbo & C-3PO*
+
+**Thank you for contributing to Turbo Fleet!** ⚡🔌
+
+---
+
+**Last Updated:** 2026-02-23
