@@ -7,6 +7,7 @@
     "test:coverage": "tsx --test --test-reporter=spec --experimental-test-coverage",
     "test:watch": "tsx --test --watch",
     "build": "echo 'No build step required for PROMPT-GENIE'",
+    "deploy": "firebase deploy --only hosting --project turbo-fleet-root",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
