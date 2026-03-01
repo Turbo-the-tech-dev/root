@@ -1,4 +1,5 @@
 import React from 'react';
+import { DailyRevenueTracker } from './components/DailyRevenueTracker';
 
 /**
  * Imperial Marketplace: Sector 22
@@ -48,10 +49,12 @@ const PRODUCTS: Product[] = [
 export const Marketplace: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-950 text-white font-sans p-8">
-      <header className="text-center mb-16 border-b-2 border-red-600 pb-8">
+      <header className="text-center mb-10 border-b-2 border-red-600 pb-8">
         <h1 className="text-5xl font-black tracking-tighter uppercase mb-4">Imperial Marketplace</h1>
         <p className="text-xl text-red-500 font-mono italic">"The path to the dark side begins with a purchase."</p>
       </header>
+
+      <DailyRevenueTracker />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
         {PRODUCTS.map(product => (
