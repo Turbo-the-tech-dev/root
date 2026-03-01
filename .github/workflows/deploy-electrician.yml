@@ -174,29 +174,22 @@ jobs:
           
           echo "deployed=true" >> $GITHUB_OUTPUT
 
-      - name: Invalidate CloudFront
+      - name: Invalidate CloudFront and Wait
         if: steps.deploy.outputs.deployed == 'true'
         env:
           CLOUDFRONT_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
         run: |
-          aws cloudfront create-invalidation \
-            --distribution-id $CLOUDFRONT_ID \
-            --paths "/*"
-
-      - name: Wait for Invalidation
-        if: steps.deploy.outputs.deployed == 'true'
-        env:
-          CLOUDFRONT_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
-        run: |
+          echo "Invalidating CloudFront: $CLOUDFRONT_ID"
           INVALIDATION_ID=$(aws cloudfront create-invalidation \
-            --distribution-id $CLOUDFRONT_ID \
+            --distribution-id "$CLOUDFRONT_ID" \
             --paths "/*" \
             --query 'Invalidation.Id' \
             --output text)
           
+          echo "Invalidation ID: $INVALIDATION_ID. Waiting for completion..."
           aws cloudfront wait invalidation-completed \
-            --distribution-id $CLOUDFRONT_ID \
-            --id $INVALIDATION_ID
+            --distribution-id "$CLOUDFRONT_ID" \
+            --id "$INVALIDATION_ID"
           
           echo "✅ CloudFront invalidation complete"
 
