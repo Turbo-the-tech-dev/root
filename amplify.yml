@@ -48,3 +48,19 @@ applications:
       cache:
         paths:
           - node_modules/**/*
+  - appRoot: sectors/22-imperial-market
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - npm install
+        build:
+          commands:
+            - npm run build
+      artifacts:
+        baseDirectory: dist
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*

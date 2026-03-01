@@ -102,6 +102,8 @@
 | **07** | **Termux** | Local Cron & Orchestration (`nightly_sync.sh`) |
 | **08** | **AWS RHEL** | Terminal History & Logic Extraction (`word_of_the_day.sh`) |
 | **18** | **Turbo Dev** | Build & Deployment Telemetry |
+| **21** | **School System** | Educational Infrastructure |
+| **22** | **Marketplace** | E-commerce & Cash App Integration |
 
 ---
 
